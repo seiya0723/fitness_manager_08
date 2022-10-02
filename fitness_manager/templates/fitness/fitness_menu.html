@@ -1,0 +1,78 @@
+{% for menu in menus %}
+<div class="menu_content_area">
+    <input id="{{ menu.id }}" class="menu_edit_chk" type="checkbox">
+
+    {# 平時に表示する領域 #}
+    <div class="menu_content">
+        <h3>{{ menu.name }}</h3>
+        {# これがMenuの削除ボタン #}
+
+        <form action="{% url 'fitness:menu_single' menu.id %}" style="display:inline-block;">
+            <input class="menu_delete" type="button" value="削除">
+        </form>
+        <label class="menu_edit_label" for="{{ menu.id }}">編集</label>
+
+        {# このメニューを始める時はこのボタンを押し、JavaScriptを発動させる。(カテゴリと時間をタイマーにセット) #}
+        <form style="display:inline-block;">
+            {% for detail in menu.details %}
+            <input type="hidden" name="category" value="{{ detail.category.id }}">
+            <input type="hidden" name="category_name" value="{{ detail.category.name }}">
+            <input type="hidden" name="time" value="{{ detail.time.total_seconds }}">
+            {% endfor %}
+            <input class="menu_start" type="button" value="このメニューを始める">
+        </form>
+
+
+        {% for detail in menu.details %}
+        <div class="row">
+            <div class="col">{{ detail.category }} : {{ detail.time_format }}</div>
+            <div class="col">
+                <form action="{% url 'fitness:menu_single' detail.id %}">
+                    <input class="menu_delete" type="button" value="削除">
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+
+
+
+
+    </div>
+
+    {# 編集時に表示する領域 #}
+    <div class="menu_edit">
+        <label class="menu_edit_label" for="{{ menu.id }}">編集キャンセル</label>
+
+        <form action="{% url 'fitness:menu_single' menu.id %}">
+        
+            <input type="text" name="name" value="{{ menu.name }}">
+            <input class="menu_detail_create_row_add" type="button" value="追加">
+
+
+            <div class="menu_detail_create_form">
+
+                {% for detail in menu.details %}
+                <div class="menu_detail_create_row">
+                    <i class="fas fa-bars handle"></i>
+                    <select name="category">
+                        <option value="">フィットネスカテゴリを選んでください</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if detail.category.id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="time" placeholder="00:00:00" value="{{ detail.time_input_format }}">
+                    <input type="hidden" name="id" value="{{ detail.id }}">
+                </div>
+                {% endfor %}
+
+                {# ここに追加される #}
+
+            </div>
+
+            <input class="menu_edit_submit" type="button" value="送信">
+        </form>
+
+    </div>
+</div>
+{% endfor %}
+
