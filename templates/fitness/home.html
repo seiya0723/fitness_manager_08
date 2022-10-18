@@ -1,0 +1,361 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>フィットネス</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    {# flatpickr #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
+    {# sortablejsで並び替えを実現する #}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    {# EasyTimer.js #}
+    <script src="https://cdn.jsdelivr.net/npm/easytimer@1.1.1/dist/easytimer.min.js"></script>
+
+    {# chart.js #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'fitness/css/home.css' %}">
+
+    <script src="{% static 'common/js/ajax.js' %}"></script>
+    <script src="{% static 'fitness/js/home.js' %}"></script>
+    <script src="{% static 'fitness/js/chart.js' %}"></script>
+
+<script>
+const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
+</script>
+
+</head>
+<body>
+
+    <div class="row mx-0">
+
+        <div class="col-sm-6">
+            {# カレンダー #}
+            <div class="calender_header">
+                <div class="calender_link_area">
+                    <a href="?year={{ last_month.year }}&month={{ last_month.month }}"><i class="fas fa-angle-left"></i></a>
+                </div>
+
+                <form class="calender_form_area" action="" method="GET">
+                    <select name="year">
+                        {% for year in years %}
+                        <option value="{{ year }}"  {% if year == selected_date.year %}selected{% endif %}>{{ year }}年</option>
+                        {% endfor %}
+                    </select>
+                    <select name="month">
+                        {% for month in months %}
+                        <option value="{{ month }}" {% if month == selected_date.month %}selected{% endif %}>{{ month }}月</option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit" value="検索">
+                </form>
+
+                <div class="calender_link_area">
+                    <a href="?year={{ next_month.year }}&month={{ next_month.month }}"><i class="fas fa-angle-right"></i></a>
+                </div>
+            </div>
+
+            <table class="calender">
+                <thead>
+                    <tr class="calender_head">
+                        <td>日</td>
+                        <td>月</td>
+                        <td>火</td>
+                        <td>水</td>
+                        <td>木</td>
+                        <td>金</td>
+                        <td>土</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week_date in month_date %}
+                    <tr>
+                        {% for date in week_date %}
+                        {# 今日の日付に背景色を加える #}
+                        <td {% if today == date.day %}style="background:orange;"{% endif %}>
+                            <div>{{ date.day.day }}</div>
+
+
+                            {% if date.day.day %}
+                            {# 1日のフィットネス時間の合計を表示 #}
+                            <div class="daily_graph_day" style="display:none;">{{ date.day.day }}</div>
+                            <div class="daily_graph_total" style="display:none;">{{ date.memories_total }}</div>
+                            {% endif %}
+
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+            {# 後にここへタブシステムを #}
+            <input id="tab_radio_1" class="tab_radio" type="radio" name="tab_system" checked>
+            <input id="tab_radio_2" class="tab_radio" type="radio" name="tab_system">
+            <input id="tab_radio_3" class="tab_radio" type="radio" name="tab_system">
+            <input id="tab_radio_4" class="tab_radio" type="radio" name="tab_system">
+            <input id="tab_radio_5" class="tab_radio" type="radio" name="tab_system">
+
+
+            <div class="tab_label_area">
+                <label class="tab_label" for="tab_radio_1">概要</label>
+                <label class="tab_label" for="tab_radio_2">日ごと</label>
+                <label class="tab_label" for="tab_radio_3">月ごと</label>
+                <label class="tab_label" for="tab_radio_4">グラフ(月間)</label>
+                <label class="tab_label" for="tab_radio_5">グラフ(年間)</label>
+
+            </div>
+
+            <div id="tab_area_1" class="tab_area">
+
+                <h2>トロフィー一覧</h2>
+
+                {% for trophy in trophies %}
+                <div>{{ trophy.name }}</div>
+                {% endfor %}
+
+
+                <h2>連続日数</h2>
+
+                {# TODO: ここに連続日数を表示させる #}
+                {% if serial >= 2 %}
+                <div>{{ serial }}日連続フィットネス中！！</div>
+                {% endif %}
+
+            </div>
+            <div id="tab_area_2" class="tab_area">
+
+                {# カレンダー連携あり #}
+                {% for week_date in month_date %}
+                {% for date in week_date %}
+
+                {# 記録がある場合のみ表示する。全ての日付を表示させることもできる #}
+
+                {% if date.memories %} {# ←やった日だけ表示させたい場合はこちら #}
+                {# {% if date.day %} #} {# ←全ての日を表示させたい場合はこちら #}
+                <div class="border">
+                    <h3>{{ date.day }}</h3>
+
+                    {% for memory in date.memories %}
+                    <div>{{ memory.category.name }}</div>
+                    <div>{{ memory.time }}</div>
+                    <div>{{ memory.exe_dt|date:"Y-m-d H:i:s" }}</div>
+                    {% empty %}
+                    <div>フィットネスデータ無し</div>
+                    {% endfor %}
+
+                </div>
+                {% endif %}
+
+                {% endfor %}
+                {% endfor %}
+
+
+            </div>
+            <div id="tab_area_3" class="tab_area">
+
+                <h2>今月のカテゴリごとのデータ</h2>
+
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>カテゴリ</th>
+                            <th>時間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for month_category_time in month_category_times %}
+                        <tr>
+                            <td class="month_category">{{ month_category_time.category }}</td>
+                            <td>{{ month_category_time.time }}</td>
+                            <td class="month_time" style="display:none;">{{ month_category_time.time_second }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>合計</td>
+                            <td>{{ month_category_total_times }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+            <div id="tab_area_4" class="tab_area">
+
+                <h2>今月の日ごとのグラフ</h2>
+                <canvas id="daily_graph"></canvas>
+
+                <h2>今月のカテゴリごとのグラフ</h2>
+
+                <div style="position:relative;width:500px;height:500px;margin:0 auto;">
+                    <canvas id="month_category_graph"></canvas>
+                </div>
+
+
+            </div>
+            <div id="tab_area_5" class="tab_area">
+
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>月</th>
+                            <th>時間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for year_total in year_totals %}
+                        <tr>
+                            <td class="year_total_month">{{ year_total.month }}月</td>
+                            <td>{{ year_total.time }}</td>
+                            <td class="year_total_time" style="display:none;">{{ year_total.time_second }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+
+
+        </div>
+
+        <div class="col-sm-6">
+
+            <div class="container_area">
+                <h2>カテゴリ追加</h2>
+
+                <form action="{% url 'fitness:fitness_category' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="name" placeholder="カテゴリ名">
+                    <input type="number" name="kcal" placeholder="1分あたりの消費カロリー">
+                    <input type="submit" value="送信">
+                </form>
+            </div>
+
+            <div class="container_area">
+                <h2>手動記録追加</h2>
+
+                <form action="{% url 'fitness:fitness_memory' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="exe_dt">
+                    <select name="category">
+                        <option value="">カテゴリを選んでください</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="time" placeholder="00:00:00">
+                    <input id="fitness_memory_submit" type="button" value="送信">
+                </form>
+            </div>
+
+
+            {# この部分は、フィットネスカテゴリを選んだ上で運動を始める #}
+            <div class="container_area">
+                <h2>ストップウォッチ</h2>
+
+                <form style="display:inline-block;">
+                    <select name="category">
+                        <option value="">フィットネスカテゴリを選んでください</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input id="watch_start" type="button" value="スタート">
+                </form>
+
+            </div>
+
+
+            <div class="container_area">
+
+                <h2>フィットネスメニュー新規作成</h2>
+
+                {# ↓MenuDetailのフォームの原型。これをJSで#menu_detail_create_formに追加する #}
+                <div id="menu_detail_create_init" class="menu_detail_create_init">
+
+                    <div class="menu_detail_create_row">
+                        <i class="fas fa-bars handle"></i>
+                        <select name="category">
+                            <option value="">フィットネスカテゴリを選んでください</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="time" placeholder="00:00:00">
+                        <input class="menu_detail_create_delete" type="button" value="削除">
+                        <input type="hidden" name="id" value="">
+                    </div>
+                </div>
+                <form action="{% url 'fitness:menu' %}" method="POST">
+                    {% csrf_token %}
+                    {# ↓Menuのフォーム #}
+                    <input type="text" name="name" placeholder="メニュー名">
+
+                    {# 追加ボタンは編集時にも使うので、class名に変更 #}
+                    <input class="menu_detail_create_row_add" type="button" value="追加">
+                    <div class="menu_detail_create_form">
+                        {# ここにDetailフォームが追加される。 #}
+                    </div>
+
+                    <input id="menu_create_submit" type="button" value="送信">
+                </form>
+            </div>
+
+            <div class="container_area">
+                {# フィットネスメニュー一覧表示、削除と編集も受け付ける。 #}
+                <h2>フィットネスメニュー一覧</h2>
+                <div id="fitness_menu_area">
+                    {% include "fitness/fitness_menu.html" %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{# メニューを始めるをクリックした時、このチェックボックスにチェックを入れ、モーダルダイアログを表示 #}
+{# メニューをJSに記録、順次カテゴリとタイマーをセット、カウントダウンを始める #}
+<input id="modal_chk" class="modal_chk" type="checkbox">
+<div class="modal_content_area">
+
+    <label class="modal_label" for="modal_chk"><i class="fa-regular fa-circle-xmark"></i></label>
+
+    <div class="modal_content">
+    
+        {# TODO:ここでタイマーとストップウォッチを兼ねる #}
+        <div id="doing_category"></div>
+        <div id="remain">00時間00分00秒</div>
+        <div>
+            {# TODO:ここの一時停止もfontawesomeの再生と停止を表示非表示を繰り返して表現してみる #}
+            <input id="timer_pause" type="button" value="一時停止">
+        </div>
+    
+        <input id="timer_second" type="number" value="0" style="display:none;">
+
+    </div>
+
+</div>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
