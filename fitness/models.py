@@ -76,13 +76,16 @@ class FoodCategory(models.Model):
     dt      = models.DateTimeField(verbose_name='登録日時', default=timezone.now)
 
     name    = models.CharField(verbose_name="食事の種類",max_length=15)
+    user    = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="投稿者",on_delete=models.CASCADE,null=True,blank=True)
 
 
 class FoodMemory(models.Model):
     id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     dt          = models.DateTimeField(verbose_name='登録日時', default=timezone.now)
-    img         = models.ImageField(verbose_name='食事画像', upload_to='fitness/food/')
+    img         = models.ImageField(verbose_name='食事画像', upload_to='fitness/food/',null=True,blank=True)
     kcal        = models.IntegerField(verbose_name='摂取したカロリー', validators=[MinValueValidator(0)])
+
+    description = models.CharField(verbose_name="自由記入欄",max_length=500,null=True,blank=True)
 
     exe_dt      = models.DateTimeField(verbose_name='実施日時')
 

@@ -31,6 +31,7 @@
     <script src="{% static 'common/js/ajax.js' %}"></script>
     <script src="{% static 'fitness/js/home.js' %}"></script>
     <script src="{% static 'fitness/js/chart.js' %}"></script>
+    <script src="{% static 'fitness/js/timer.js' %}"></script>
 
 <script>
 const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
@@ -94,6 +95,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                             <div class="daily_graph_total" style="display:none;">{{ date.memories_total }}</div>
                             {% endif %}
 
+
                         </td>
                         {% endfor %}
                     </tr>
@@ -144,10 +146,13 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 {# 記録がある場合のみ表示する。全ての日付を表示させることもできる #}
 
-                {% if date.memories %} {# ←やった日だけ表示させたい場合はこちら #}
+                {% if date.memories or date.food_memories %} {# ←やった日だけ表示させたい場合はこちら #}
                 {# {% if date.day %} #} {# ←全ての日を表示させたい場合はこちら #}
                 <div class="border">
                     <h3>{{ date.day }}</h3>
+
+
+                    <h4>フィットネスデータ</h4>
 
                     {% for memory in date.memories %}
                     <div>{{ memory.category.name }}</div>
@@ -157,12 +162,22 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                     <div>フィットネスデータ無し</div>
                     {% endfor %}
 
+
+                    <h4>フードデータ</h4>
+
+                    {% for food_memory in date.food_memories %}
+                    <div>{{ food_memory.category.name }}</div>
+                    <div>{{ food_memory.description }}</div>
+                    <div>{{ food_memory.exe_dt|date:"Y-m-d H:i:s" }}</div>
+                    {% empty %}
+                    <div>フードデータ無し</div>
+                    {% endfor %}
+
                 </div>
                 {% endif %}
 
                 {% endfor %}
                 {% endfor %}
-
 
             </div>
             <div id="tab_area_3" class="tab_area">
@@ -208,6 +223,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
             </div>
             <div id="tab_area_5" class="tab_area">
 
+                <h2>年間データ</h2>
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
@@ -226,6 +242,10 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                     </tbody>
                 </table>
 
+                <h2>年間グラフ</h2>
+
+                <canvas id="year_graph"></canvas>
+
             </div>
 
 
@@ -234,7 +254,42 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
         <div class="col-sm-6">
 
             <div class="container_area">
-                <h2>カテゴリ追加</h2>
+                <h2>フードカテゴリ追加</h2>
+
+                <form action="{% url 'fitness:food_category' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="name" placeholder="カテゴリ名">
+                    <input type="submit" value="送信">
+                </form>
+
+            </div>
+
+
+            <div class="container_area">
+
+                <h2>フード記録追加</h2>
+
+                <form action="{% url 'fitness:food_memory' %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="text" name="exe_dt">
+                    <input type="number" name="kcal" placeholder="カロリー">
+                    <label>画像:<input type="file" name="img"></label>
+                    <select class="form-control" name="category">
+                        <option value="">カテゴリを選んでください</option>
+                        {% for food_category in food_categories %}
+                        <option value="{{ food_category.id }}">{{ food_category.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <textarea class="form-control" name="description" placeholder="自由記入欄"></textarea>
+
+                    <input type="submit" value="送信">
+                </form>
+
+            </div>
+
+            <div class="container_area">
+                <h2>フィットネスカテゴリ追加</h2>
 
                 <form action="{% url 'fitness:fitness_category' %}" method="POST">
                     {% csrf_token %}
@@ -340,7 +395,13 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
         <div id="remain">00時間00分00秒</div>
         <div>
             {# TODO:ここの一時停止もfontawesomeの再生と停止を表示非表示を繰り返して表現してみる #}
+            {% comment %}
             <input id="timer_pause" type="button" value="一時停止">
+            {% endcomment %}
+            <div id="timer_pause" class="timer_pause">
+                <i class="fa-solid fa-play" style="display:none;"></i>
+                <i class="fa-solid fa-pause"></i>
+            </div>
         </div>
     
         <input id="timer_second" type="number" value="0" style="display:none;">

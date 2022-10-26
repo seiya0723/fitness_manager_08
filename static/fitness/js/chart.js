@@ -8,17 +8,18 @@ window.addEventListener("load" , function (){
 
 
 });
-
-
 function draw_daily_graph(){
 
-    let day_elems    = $(".daily_graph_day")
-    let total_elems  = $(".daily_graph_total")
+    let day_elems    = $(".daily_graph_day");
+    let total_elems  = $(".daily_graph_total");
 
+    //chart.jsに入れるラベルとデータ
     let days    = [];
     let totals  = [];
 
+    //day_elemsはjQueryのオブジェクトだが、取り出すとJavaScriptのオブジェクトになる
     for (let day_elem of day_elems){
+        //innerText属性で参照する
         days.push(day_elem.innerText);
     }
     for (let total_elem of total_elems){
@@ -91,7 +92,41 @@ function draw_month_category_graph(){
 //同じ要領で年間のグラフを生成する。
 function draw_year_total_graph(){
 
+    let month_elems = $(".year_total_month");
+    let total_elems = $(".year_total_time");
 
+    //chart.jsに入れるラベルとデータ
+    let months  = [];
+    let totals  = [];
 
+    //month_elemsはjQueryのオブジェクトだが、取り出すとJavaScriptのオブジェクトになる
+    for (let month_elem of month_elems){
+        //innerText属性で参照する
+        months.push(month_elem.innerText);
+    }
+    for (let total_elem of total_elems){
+        totals.push(total_elem.innerText);
+    }
+
+    const ctx = document.getElementById('year_graph').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: "運動時間(秒)",
+                data: totals,
+                backgroundColor: "orange",
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 
 }

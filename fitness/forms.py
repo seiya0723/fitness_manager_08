@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum
 from django.utils import timezone
 
-from .models import FitnessCategory,FitnessMemory,Menu,MenuDetail, Trophy
+from .models import FitnessCategory,FitnessMemory,Menu,MenuDetail,Trophy,FoodCategory,FoodMemory
 
 
 import datetime
@@ -15,6 +15,22 @@ import datetime
 class YearMonthForm(forms.Form):
     year    = forms.IntegerField()
     month   = forms.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
+
+
+
+class FoodCategoryForm(forms.ModelForm):
+
+    class Meta:
+        model   = FoodCategory
+        fields  = ["name","user"]
+
+class FoodMemoryForm(forms.ModelForm):
+
+    class Meta:
+        model   = FoodMemory
+        fields  = ["img","kcal","description","exe_dt","category","user",]
+
+
 
 
 class FitnessCategoryForm(forms.ModelForm):
@@ -50,10 +66,9 @@ class FitnessMemoryForm(forms.ModelForm):
         #一日ごとにマイナスしていくループを作る、fitness_memoryがなくなった時、連続のカウントをやめる
 
 
-        serial_flag = True
         serial      = 0
 
-        while serial_flag:
+        while True:
             #指定日付のデータが存在するかチェック
             serial_flag = FitnessMemory.objects.filter(user=fitness_memory.user.id, exe_dt__year=now.year, exe_dt__month=now.month, exe_dt__day=now.day ).exists()
 
@@ -74,7 +89,6 @@ class FitnessMemoryForm(forms.ModelForm):
         for trophy in trophies:
             trophy.user.add(fitness_memory.user)
             print("追加")
-
 
 
 

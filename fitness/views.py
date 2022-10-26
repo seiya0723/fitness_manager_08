@@ -14,7 +14,8 @@ from django.utils import timezone
 
 from . import calendar
 from .models import FitnessCategory,FitnessMemory,FoodCategory,FoodMemory,Menu,MenuDetail,Trophy,TrophyUser
-from .forms import YearMonthForm,FitnessCategoryForm,FitnessMemoryForm,MenuForm,MenuDetailForm,UUIDForm
+from .forms import YearMonthForm,FitnessCategoryForm,FitnessMemoryForm,MenuForm,MenuDetailForm,UUIDForm,FoodCategoryForm,FoodMemoryForm
+
 
 import datetime
 
@@ -45,6 +46,9 @@ class HomeView(LoginRequiredMixin,View):
         context["categories"]   = FitnessCategory.objects.filter(user=request.user.id).order_by("-dt")
         context["menus"]        = Menu.objects.filter(user=request.user.id).order_by("-dt")
 
+        #FoodCategory
+        context["food_categories"]  = FoodCategory.objects.filter(user=request.user.id).order_by("-dt")
+        #FoodMemory.objects.filter(user=request.user.id).order_by("-dt")
 
         #カレンダーを作る
         month_date  = calendar.create_calendar(selected_date.year, selected_date.month)
@@ -61,12 +65,19 @@ class HomeView(LoginRequiredMixin,View):
                 query = Q(user=request.user.id, exe_dt__year=calendar_date.year, exe_dt__month=calendar_date.month, exe_dt__day=calendar_date.day)
 
                 date["memories"]        = FitnessMemory.objects.filter(query).order_by("dt")
+                date["food_memories"]   = FoodMemory.objects.filter(query).order_by("dt")
+
+                print(date["food_memories"])
+
+
+
 
                 #TODO:日ごとの合計を記録
                 memories_total          = FitnessMemory.objects.filter(query).order_by("dt").aggregate(Sum("time"))
 
+                #このmemories_total["time__sum"]にはtimedeltaのオブジェクトが入っている、もしデータがない場合はNone
                 if memories_total["time__sum"]:
-                    # chart.jsでは時間でグラフを作れない。秒に統一させる
+                    # chart.jsでは時間でグラフを作れない。秒に統一させる(分単位で出したい場合は↓を60で割る、もしくはJS側で60で割る)
                     date["memories_total"]  = memories_total["time__sum"].total_seconds()
                 else:
                     date["memories_total"]  = 0
@@ -94,21 +105,23 @@ class HomeView(LoginRequiredMixin,View):
 
                 dic["time"]         = fitness["time__sum"]
                 dic["time_second"]  = fitness["time__sum"].total_seconds()
+
+                month_category_total_times += fitness["time__sum"]
             else:
                 dic["time"]         = 0
                 dic["time_second"]  = 0
 
             month_category_times.append(dic)
 
-            month_category_total_times += fitness["time__sum"]
 
         context["month_category_times"]         = month_category_times
         context["month_category_total_times"]   = month_category_total_times
 
-        #TODO:この原理を利用して1年分を月ごとに分けて集計する。(←グラフに利用できる)
+
+
+        #この原理を利用して1年分を月ごとに分けて集計する。(←グラフに利用できる)
 
         #selected_dateを起点に1月から順に追加していく。
-
 
         year_totals = []
         
@@ -127,26 +140,15 @@ class HomeView(LoginRequiredMixin,View):
 
             year_totals.append(dic)
 
-        context["year_totals"] = year_total
-
-
-
-
-
-
-
-
-
-
+        context["year_totals"] = year_totals
 
         
         now = timezone.now()
 
         #TODO:連続日数計算処理(forms.pyでも使うので、別ファイル化しても良いかも)
-        serial_flag = True
         serial      = 0 
 
-        while serial_flag:
+        while True:
             #指定日付のデータが存在するかチェック
             serial_flag = FitnessMemory.objects.filter(user=request.user.id, exe_dt__year=now.year, exe_dt__month=now.month, exe_dt__day=now.day ).exists()
 
@@ -160,6 +162,19 @@ class HomeView(LoginRequiredMixin,View):
             serial += 1
 
         context["serial"] = serial
+
+        #連続日数が止まった時、トロフィーを剥奪
+        """
+        # 取得済みのトロフィーの中で、現在の連続日数記録よりも大きいものを取り出し、剥奪する。
+        trophies = Trophy.objects.filter(serial__gt=serial,user=request.user)
+
+        #トロフィーをループして取得処理を
+        for trophy in trophies:
+            trophy.user.remove(request.user)
+            print("剥奪")
+        """
+
+
 
 
 
@@ -245,10 +260,31 @@ fitness_memory = FitnessMemoryView.as_view()
 
 
 class FoodCategoryView(LoginRequiredMixin,View):
+
+
     def get(self, request, *args, **kwargs):
         pass
+
+
     def post(self, request, *args, **kwargs):
-        pass
+
+        data        = {"error":True}
+
+        copied          = request.POST.copy()
+        copied["user"]  = request.user.id
+
+        form    = FoodCategoryForm(copied)
+
+        if not form.is_valid():
+            print(form.errors)
+            return redirect("fitness:home")
+
+        data["error"]   = False
+        form.save()
+
+        return redirect("fitness:home")
+
+
     def put(self, request, *args, **kwargs):
         pass
     def delete(self, request, *args, **kwargs):
@@ -259,14 +295,38 @@ food_category   = FoodCategoryView.as_view()
 
 
 class FoodMemoryView(LoginRequiredMixin,View):
+
+
+
     def get(self, request, *args, **kwargs):
         pass
+
     def post(self, request, *args, **kwargs):
-        pass
+
+        data        = {"error":True}
+
+        copied          = request.POST.copy()
+        copied["user"]  = request.user.id
+
+        form    = FoodMemoryForm(copied, request.FILES)
+
+        if not form.is_valid():
+            print(form.errors)
+            return redirect("fitness:home")
+
+        data["error"]   = False
+        food = form.save()
+        print(food)
+
+        return redirect("fitness:home")
+
     def put(self, request, *args, **kwargs):
         pass
     def delete(self, request, *args, **kwargs):
         pass
+
+
+food_memory = FoodMemoryView.as_view()
 
 
 class MenuView(LoginRequiredMixin,View):

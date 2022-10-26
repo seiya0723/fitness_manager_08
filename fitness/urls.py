@@ -6,6 +6,10 @@ urlpatterns = [
     path('', views.Home, name="home"),
     path('fitness_category/', views.fitness_category, name="fitness_category"),
     path('fitness_memory/', views.fitness_memory, name="fitness_memory"),
+
+    path('food_category/', views.food_category, name="food_category"),
+    path('food_memory/', views.food_memory, name="food_memory"),
+
     path('menu/', views.menu, name="menu"),
     path('menu/<uuid:pk>/', views.menu, name="menu_single"),
 

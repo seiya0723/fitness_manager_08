@@ -148,6 +148,10 @@ input[type="radio"]#tab_radio_5:checked ~ #tab_area_5 { display:block; }
     }
 }
 
+.timer_pause{
+    font-size:4rem;
+    cursor:pointer;
+}
 
 
 

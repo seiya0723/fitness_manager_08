@@ -1,8 +1,3 @@
-//グローバル変数に、MenuDetailのカテゴリと時間を入れる。
-MENU_DETAILS    = [];
-//現在実行中のMenuDetailのindex番号
-DOING_DETAIL    = 0;
-
 window.addEventListener("load" , function (){
 
     //フィットネスメニューの追加と削除
@@ -19,13 +14,12 @@ window.addEventListener("load" , function (){
     $(document).on("click", "#menu_create_submit", function(){ menu_create(this); });
     $(document).on("click", ".menu_delete", function(){ menu_delete(this); });
     $(document).on("click", ".menu_edit_submit", function(){ menu_edit(this); });
-
     
-    //Menuを始める(MenuDetailを取得して、モーダルを表示、タイマー発動)
-    $(document).on("click", ".menu_start", function(){ menu_pre_start(this); });
+    //TODO:モーダルを表示した状態で更新すると表示されっぱなしになるので、ロードした時点で消しておく。
+    $("#modal_chk").prop("checked", false);
 
-    //TODO:ストップウォッチで始める。タイマーと共存させることで書く量を減らせるのでは？
-    $(document).on("click", "#watch_start", function(){ watch_pre_start(this); });
+    //メニューの編集もチェックを消しておく。
+    $(".menu_edit_chk").prop("checked",false);
 
 
     //新規作成時・編集時の並び替え
@@ -45,7 +39,6 @@ window.addEventListener("load" , function (){
         }
     }
     detail_sortable()
-
 
     //手動記録追加時の日付フォーム
     let today   = new Date();
@@ -164,6 +157,7 @@ function menu_edit(elem){
 
 }
 
+/*
 function watch_pre_start(elem){
 
     let form_elem   = $(elem).parents("form");
@@ -219,20 +213,35 @@ function menu_pre_start(elem){
     menu_start();
 }
 function menu_start(watch=false){
+        
+    if (watch){
+        console.log("ストップウォッチ")
+    }
+    else{
+        console.log("メニュー")
+    }
 
-    //Timerオブジェクトを作る
-    let timer = new Timer();
+
+
+    //Timerオブジェクトを作る←グローバル変数化して、上書きすれば良いのでは？
+    timer = new Timer();
 
     //モーダルを閉じる時、タイマーをストップして初期化。
     $(document).on("click", ".modal_label" , function(){ 
         //watchであれば閉じる時に記録しておく
         if (watch){
+            console.log("ストップウォッチなので投稿する。")
             MENU_DETAILS[DOING_DETAIL]["time"] = $('#remain').text();
             fitness_memory_list_submit(MENU_DETAILS);
         }
         DOING_DETAIL = 0;
         MENU_DETAILS = [];
+
+        //FIXME:おそらくここでストップウォッチがストップされた状態で終わっている。次に何かTimerを動かすとこの状態からスタートしてしまう？
         timer.stop();
+
+        //リセットで対処？←そんなfunctionはない
+        //timer.reset();
     }); 
     
     //ポーズするときのイベント
@@ -241,12 +250,19 @@ function menu_start(watch=false){
         //isRunning()で動作中かどうかを判定できる
         if (timer.isRunning()){
             timer.pause();
-            $(this).val("再開"); // TODO:ここでfontawesomeの再生と一時停止のアイコンを表示非表示させる
+            $(this).val("再開");
+
+            // TODO:ここでfontawesomeの再生と一時停止のアイコンを表示非表示させる
             //次回レッスンまでにfontawesomeの実装
+            $(this).children(".fa-play").css({"display":"inline"});
+            $(this).children(".fa-pause").css({"display":"none"});
         }
         else{
             timer.start();
+
             $(this).val("一時停止");
+            $(this).children(".fa-play").css({"display":"none"});
+            $(this).children(".fa-pause").css({"display":"inline"});
         }
     });
 
@@ -295,6 +311,7 @@ function play_music(url) {
     sound.src       = url;
     sound.play();
 }
+*/
 
 
 //手動記録用

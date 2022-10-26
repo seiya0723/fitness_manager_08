@@ -7,10 +7,10 @@ class FitnessCategoryAdmin(admin.ModelAdmin):
     list_display    = ["id","dt","name","kcal","user",]
 
 class FitnessMemoryAdmin(admin.ModelAdmin):
-    list_display    = ["id","dt","category","time","user",]
+    list_display    = ["id","dt","category","time","user","exe_dt"]
 
 class FoodMemoryAdmin(admin.ModelAdmin):
-    list_display    = ["id","dt","img","kcal","user",]
+    list_display    = ["id","dt","img","kcal","user"]
 
 class MenuAdmin(admin.ModelAdmin):
     list_display    = ["id","dt","name","user",]
