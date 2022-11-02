@@ -11,6 +11,15 @@ def create_calendar(year,month):
     calendar    = []
     week        = []
 
+    
+    #TODO:先月と来月の日付も入れたい場合の対策
+
+    """
+    1. 空欄を入れるのではなく、timedeltaで加減算した値を入れる
+    2. 今月でない日付の場合は、テンプレート側で目立たないように装飾を入れるため、 to_monthのキーにFalseを入れておく。
+    3. 今月のデータだけ表示する時、to_monthを元に分岐させる
+    """
+
     #月始めが日曜日以外の場合、空欄を追加する。
     if dt.weekday() != 6:
         week    = [ {"day":""} for i in range(dt.weekday()+1) ]

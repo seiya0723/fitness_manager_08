@@ -67,10 +67,7 @@ class HomeView(LoginRequiredMixin,View):
                 date["memories"]        = FitnessMemory.objects.filter(query).order_by("dt")
                 date["food_memories"]   = FoodMemory.objects.filter(query).order_by("dt")
 
-                print(date["food_memories"])
-
-
-
+                #print(date["food_memories"])
 
                 #TODO:日ごとの合計を記録
                 memories_total          = FitnessMemory.objects.filter(query).order_by("dt").aggregate(Sum("time"))
@@ -106,7 +103,9 @@ class HomeView(LoginRequiredMixin,View):
                 dic["time"]         = fitness["time__sum"]
                 dic["time_second"]  = fitness["time__sum"].total_seconds()
 
+                #カテゴリの合計がある場合、合計に加算
                 month_category_total_times += fitness["time__sum"]
+
             else:
                 dic["time"]         = 0
                 dic["time_second"]  = 0

@@ -222,13 +222,18 @@ function menu_start(watch=false){
     }
 
 
+    //バグ2:バグ1を直すためにloadに入れる。ただ、timerがローカル変数になっているので、グローバル変数にする。
 
     //Timerオブジェクトを作る←グローバル変数化して、上書きすれば良いのでは？
-    timer = new Timer();
+    let timer = new Timer();
+
+    //バグ1:ここでイベントをセットすると、ストップウォッチもしくはタイマーを起動するたびに↓のイベントがセットされていく。多重に処理が実行されてしまう。冒頭のloadに入れて1回だけ実行
 
     //モーダルを閉じる時、タイマーをストップして初期化。
     $(document).on("click", ".modal_label" , function(){ 
         //watchであれば閉じる時に記録しておく
+
+        //バグ4:このwatchをグローバル変数WATCHに仕立てる。loadに入れると参照できなくなるので
         if (watch){
             console.log("ストップウォッチなので投稿する。")
             MENU_DETAILS[DOING_DETAIL]["time"] = $('#remain').text();
@@ -240,8 +245,8 @@ function menu_start(watch=false){
         //FIXME:おそらくここでストップウォッチがストップされた状態で終わっている。次に何かTimerを動かすとこの状態からスタートしてしまう？
         timer.stop();
 
-        //リセットで対処？←そんなfunctionはない
-        //timer.reset();
+        $("#timer_pause").children(".fa-play").css({"display":"none"});
+        $("#timer_pause").children(".fa-pause").css({"display":"inline"});
     }); 
     
     //ポーズするときのイベント
@@ -256,13 +261,20 @@ function menu_start(watch=false){
             //次回レッスンまでにfontawesomeの実装
             $(this).children(".fa-play").css({"display":"inline"});
             $(this).children(".fa-pause").css({"display":"none"});
+
+            //バグ3:この一時停止の装飾をモーダルを閉じるときにも実行する、ただし、thisは使えない。
+            $("#timer_pause").children(".fa-play").css({"display":"inline"});
+            $("#timer_pause").children(".fa-pause").css({"display":"none"});
         }
         else{
             timer.start();
-
             $(this).val("一時停止");
             $(this).children(".fa-play").css({"display":"none"});
             $(this).children(".fa-pause").css({"display":"inline"});
+
+            $("#timer_pause").children(".fa-play").css({"display":"none"});
+            $("#timer_pause").children(".fa-pause").css({"display":"inline"});
+
         }
     });
 
@@ -286,6 +298,9 @@ function menu_start(watch=false){
     //時間とカテゴリの表示
     $("#doing_category").html(MENU_DETAILS[DOING_DETAIL]["name"]);
     $('#remain').html(timer.getTimeValues().toString());
+
+
+    //バグ5:timerをグローバル変数化するので、ここにイベントをセットすると多重に実行されてしまう。これもloadに入れる。
 
     //時間経過したときのイベント
     timer.addEventListener('secondsUpdated', function (e) {

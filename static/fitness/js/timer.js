@@ -30,20 +30,25 @@ window.addEventListener("load" , function (){
 
         //カウントダウン終了時のイベント
         timer.addEventListener('targetAchieved', function (e) {
+
+            //TODO:カウントダウン終了時、一旦初期化する。これがないと次のタイマーが動かない。
+            timer_init()
+
             //1個のMenuDetail終了時、次のMenuDetailに行くため、DOING_DETAILを1加算して、start_menu()を実行する
             DOING_DETAIL += 1;
             menu_start();
             play_music(ALARM);
+
         });
     }
     timer_init();
-
 
     //モーダルを閉じる時、タイマーをストップして初期化。
     $(document).on("click", ".modal_label" , function(){
         console.log("モーダルを閉じる")
         timer.stop();
 
+        //TODO:ここでフィットネスを保存して終了、保存しないで終了するボタンを作る
         //ストップウォッチ稼働中の時、送信処理を実行
         if (WATCH){
             MENU_DETAILS[DOING_DETAIL]["time"] = $('#remain').text();
@@ -57,6 +62,8 @@ window.addEventListener("load" , function (){
         $("#timer_pause").children(".fa-play").css({"display":"none"});
         $("#timer_pause").children(".fa-pause").css({"display":"inline"});
 
+        //TODO:タイマーを動かした後、ストップウォッチを動かそうとした時、ストップウォッチが動かない問題の対策
+        //タイマーの後にタイマーを動かした場合は問題なく動く。
         timer_init();
 
         console.log("閉じる");
@@ -145,20 +152,32 @@ function menu_start(){
         DOING_DETAIL = 0;
         //ここで実行したフィットネスの記録をするAjaxを実行
         fitness_memory_list_submit(MENU_DETAILS);
+
+        //TODO:終わったら初期化して、モーダルを閉じる
+
+        MENU_DETAILS = [];
+        DOING_DETAIL = 0;
+        $("#modal_chk").prop("checked",false);
+
         return;
     }
 
     if (WATCH){
         console.log("ウォッチスタート")
+
+        //メニューを動かした後、タイマーを動かす際、timer_init()を実行しないと動いてくれない問題
+        //timer.start({countdown: false,  startValues: {seconds: 0 } });
         timer.start({countdown: false });
     }
     else{
+        console.log("実行");
         timer.start({countdown: true, startValues: {seconds: MENU_DETAILS[DOING_DETAIL]["time"] }});
     }
 
     //時間とカテゴリの表示
     $("#doing_category").html(MENU_DETAILS[DOING_DETAIL]["name"]);
     $('#remain').html(timer.getTimeValues().toString());
+
 
 }
 function play_music(url) {

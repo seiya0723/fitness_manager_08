@@ -57,7 +57,8 @@ class FitnessMemory(models.Model):
 
     exe_dt      = models.DateTimeField(verbose_name='実施日時')
 
-    category    = models.ForeignKey(FitnessCategory, verbose_name='カテゴリー', on_delete=models.SET_NULL, null=True)
+    #on_deleteはmodels.PROTECTかmodels.SET_NULLにする。CASCADEトロフィーの授与処理も影響を受ける
+    category    = models.ForeignKey(FitnessCategory, verbose_name='カテゴリー', on_delete=models.PROTECT, null=True)
     time        = models.DurationField(verbose_name="運動時間")
     user        = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="投稿者",on_delete=models.CASCADE)
 
@@ -76,6 +77,8 @@ class FoodCategory(models.Model):
     dt      = models.DateTimeField(verbose_name='登録日時', default=timezone.now)
 
     name    = models.CharField(verbose_name="食事の種類",max_length=15)
+
+    #TODO:開発最終段階でDBとマイグレーションファイルを消す時、このnull=Trueとblank=Trueを消す
     user    = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="投稿者",on_delete=models.CASCADE,null=True,blank=True)
 
 
@@ -89,7 +92,7 @@ class FoodMemory(models.Model):
 
     exe_dt      = models.DateTimeField(verbose_name='実施日時')
 
-    category    = models.ForeignKey(FoodCategory,verbose_name="カテゴリ",on_delete=models.CASCADE,null=True,blank=True)
+    category    = models.ForeignKey(FoodCategory,verbose_name="カテゴリ",on_delete=models.PROTECT,null=True,blank=True)
     user        = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="投稿者",on_delete=models.CASCADE)
 
     def __str__(self):

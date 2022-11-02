@@ -42,14 +42,14 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
     <div class="row mx-0">
 
-        <div class="col-sm-6">
+        <div id="calendar" class="col-sm-6">
             {# カレンダー #}
-            <div class="calender_header">
-                <div class="calender_link_area">
+            <div class="calendar_header">
+                <div class="calendar_link_area">
                     <a href="?year={{ last_month.year }}&month={{ last_month.month }}"><i class="fas fa-angle-left"></i></a>
                 </div>
 
-                <form class="calender_form_area" action="" method="GET">
+                <form class="calendar_form_area" action="" method="GET">
                     <select name="year">
                         {% for year in years %}
                         <option value="{{ year }}"  {% if year == selected_date.year %}selected{% endif %}>{{ year }}年</option>
@@ -63,14 +63,14 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                     <input type="submit" value="検索">
                 </form>
 
-                <div class="calender_link_area">
+                <div class="calendar_link_area">
                     <a href="?year={{ next_month.year }}&month={{ next_month.month }}"><i class="fas fa-angle-right"></i></a>
                 </div>
             </div>
 
-            <table class="calender">
+            <table class="calendar">
                 <thead>
-                    <tr class="calender_head">
+                    <tr class="calendar_head">
                         <td>日</td>
                         <td>月</td>
                         <td>火</td>
@@ -111,14 +111,12 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
             <input id="tab_radio_4" class="tab_radio" type="radio" name="tab_system">
             <input id="tab_radio_5" class="tab_radio" type="radio" name="tab_system">
 
-
-            <div class="tab_label_area">
+            <div id="summary" class="tab_label_area">
                 <label class="tab_label" for="tab_radio_1">概要</label>
                 <label class="tab_label" for="tab_radio_2">日ごと</label>
                 <label class="tab_label" for="tab_radio_3">月ごと</label>
                 <label class="tab_label" for="tab_radio_4">グラフ(月間)</label>
                 <label class="tab_label" for="tab_radio_5">グラフ(年間)</label>
-
             </div>
 
             <div id="tab_area_1" class="tab_area">
@@ -215,7 +213,8 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <h2>今月のカテゴリごとのグラフ</h2>
 
-                <div style="position:relative;width:500px;height:500px;margin:0 auto;">
+                {# TODO:widthを修正。スマホ表示時に対応 #}
+                <div style="position:relative;width:500px;max-width:100%;margin:0 auto;">
                     <canvas id="month_category_graph"></canvas>
                 </div>
 
@@ -253,18 +252,20 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
         <div class="col-sm-6">
 
-            <div class="container_area">
+            <div id="food" class="container_area">
                 <h2>フードカテゴリ追加</h2>
 
                 <form action="{% url 'fitness:food_category' %}" method="POST">
                     {% csrf_token %}
-                    <input type="text" name="name" placeholder="カテゴリ名">
-                    <input type="submit" value="送信">
+
+                    <div class="input-group">
+                        <input class="form-control" type="text" name="name" placeholder="カテゴリ名">
+                        <div class="input-group-append">
+                            <input class="form-control" type="submit" value="送信">
+                        </div>
+                    </div>
                 </form>
-
             </div>
-
-
             <div class="container_area">
 
                 <h2>フード記録追加</h2>
@@ -288,7 +289,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
             </div>
 
-            <div class="container_area">
+            <div id="fitness" class="container_area">
                 <h2>フィットネスカテゴリ追加</h2>
 
                 <form action="{% url 'fitness:fitness_category' %}" method="POST">
@@ -321,20 +322,23 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
             <div class="container_area">
                 <h2>ストップウォッチ</h2>
 
-                <form style="display:inline-block;">
-                    <select name="category">
+                <form class="input-group">
+
+                    <select class="form-control" name="category">
                         <option value="">フィットネスカテゴリを選んでください</option>
                         {% for category in categories %}
                         <option value="{{ category.id }}">{{ category.name }}</option>
                         {% endfor %}
                     </select>
-                    <input id="watch_start" type="button" value="スタート">
+                    <div class="input-group-append">
+                        <input id="watch_start" class="form-control" type="button" value="スタート">
+                    </div>
                 </form>
 
             </div>
 
 
-            <div class="container_area">
+            <div id="menu" class="container_area">
 
                 <h2>フィットネスメニュー新規作成</h2>
 
@@ -381,12 +385,56 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
     </div>
 
 
+
+{# スマホ用メニュー #}
+
+
+<div class="sp_menu_area">
+
+    <a class="sp_menu_content" href="#calendar">
+        <div class="sp_menu_icon"><i class="fa-solid fa-calendar-days"></i></div>
+        <div class="sp_menu_description">カレンダー</div>
+    </a>
+    <a class="sp_menu_content" href="#summary">
+        <div class="sp_menu_icon"><i class="fa-regular fa-clipboard"></i></div>
+        <div class="sp_menu_description">サマリー</div>
+    </a>
+    <a class="sp_menu_content" href="#fitness">
+        <div class="sp_menu_icon"><i class="fa-solid fa-dumbbell"></i></div>
+        <div class="sp_menu_description">フィットネス</div>
+    </a>
+    <a class="sp_menu_content" href="#food">
+        <div class="sp_menu_icon"><i class="fa-solid fa-utensils"></i></div>
+        <div class="sp_menu_description">食事</div>
+    </a>
+    <a class="sp_menu_content" href="#menu">
+        <div class="sp_menu_icon"><i class="fa-solid fa-list"></i></div>
+        <div class="sp_menu_description">メニュー</div>
+    </a>
+
+</div>
+
+
+
+
+
+
+
+
+
+
 {# メニューを始めるをクリックした時、このチェックボックスにチェックを入れ、モーダルダイアログを表示 #}
 {# メニューをJSに記録、順次カテゴリとタイマーをセット、カウントダウンを始める #}
 <input id="modal_chk" class="modal_chk" type="checkbox">
 <div class="modal_content_area">
 
+
+    {# TODO:保存しないで終了を実装させる #}
+
     <label class="modal_label" for="modal_chk"><i class="fa-regular fa-circle-xmark"></i></label>
+    <label class="modal_label modal_label_save" for="modal_chk"><i class="fa-solid fa-floppy-disk"></i></label>
+    
+
 
     <div class="modal_content">
     
