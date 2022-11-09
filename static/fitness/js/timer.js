@@ -34,6 +34,15 @@ window.addEventListener("load" , function (){
             //TODO:カウントダウン終了時、一旦初期化する。これがないと次のタイマーが動かない。
             timer_init()
 
+
+            //ここでtimer.start()を発動することはできない既に、Timerのオブジェクトが作られstartしているから。
+            //stopで次のメニューに行けるようになる(startが発動できるようになる)
+            //カウントダウンをしてくれない。(timer.jsの仕様？)
+            //timer.stop()
+
+            timer_init();
+
+
             //1個のMenuDetail終了時、次のMenuDetailに行くため、DOING_DETAILを1加算して、start_menu()を実行する
             DOING_DETAIL += 1;
             menu_start();
@@ -48,11 +57,14 @@ window.addEventListener("load" , function (){
         console.log("モーダルを閉じる")
         timer.stop();
 
-        //TODO:ここでフィットネスを保存して終了、保存しないで終了するボタンを作る
         //ストップウォッチ稼働中の時、送信処理を実行
         if (WATCH){
-            MENU_DETAILS[DOING_DETAIL]["time"] = $('#remain').text();
-            fitness_memory_list_submit(MENU_DETAILS);
+
+            //フロッピーのアイコンをクリックした時だけ保存処理を実行する。
+            if ($(this).hasClass("modal_label_save")){
+                MENU_DETAILS[DOING_DETAIL]["time"] = $('#remain').text();
+                fitness_memory_list_submit(MENU_DETAILS);
+            }
         }
 
         MENU_DETAILS = [];
@@ -68,6 +80,9 @@ window.addEventListener("load" , function (){
 
         console.log("閉じる");
     });
+
+
+
 
     //ポーズするときのイベント
     $(document).on("click", "#timer_pause" , function(){
@@ -146,6 +161,15 @@ function menu_start(){
 
     //モーダルを表示
     $("#modal_chk").prop("checked",true);
+
+    //メニュー実行時はフロッピーを非表示
+    if (WATCH){
+        $(".modal_label_save").css({"display":""});
+    }
+    else{
+        $(".modal_label_save").css({"display":"none"});
+    }
+
 
     //現在実行中のMenuDetailのindex番号がはみ出ている時、0に戻してreturnを実行する
     if ( MENU_DETAILS.length <= DOING_DETAIL ){

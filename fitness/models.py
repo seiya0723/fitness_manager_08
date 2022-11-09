@@ -7,6 +7,7 @@ from django.db.models import Sum
 from django.conf import settings
 
 import uuid
+import datetime
 
 
 #DurationFieldの表示用処理
@@ -20,7 +21,6 @@ def duration_format(total,input_format=False):
         return '{}:{}:{}'.format(hours.zfill(2), minutes.zfill(2), seconds.zfill(2))
     else:
         return '{}時間{}分{}秒'.format(hours, minutes, seconds)
-
 
 
 class FitnessCategory(models.Model):
@@ -59,9 +59,11 @@ class FitnessMemory(models.Model):
 
     #on_deleteはmodels.PROTECTかmodels.SET_NULLにする。CASCADEトロフィーの授与処理も影響を受ける
     category    = models.ForeignKey(FitnessCategory, verbose_name='カテゴリー', on_delete=models.PROTECT, null=True)
-    time        = models.DurationField(verbose_name="運動時間")
-    user        = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="投稿者",on_delete=models.CASCADE)
 
+    #TODO:フィットネス時間0秒での投稿は許さない
+    time        = models.DurationField(verbose_name="運動時間",validators=[MinValueValidator(datetime.timedelta(seconds=1))])
+
+    user        = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="投稿者",on_delete=models.CASCADE)
 
 
     def time_format(self):
@@ -87,6 +89,7 @@ class FoodMemory(models.Model):
     dt          = models.DateTimeField(verbose_name='登録日時', default=timezone.now)
     img         = models.ImageField(verbose_name='食事画像', upload_to='fitness/food/',null=True,blank=True)
     kcal        = models.IntegerField(verbose_name='摂取したカロリー', validators=[MinValueValidator(0)])
+
 
     description = models.CharField(verbose_name="自由記入欄",max_length=500,null=True,blank=True)
 
@@ -171,3 +174,29 @@ class TrophyUser(models.Model):
     user        = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="登録者",on_delete=models.CASCADE)
     dt          = models.DateTimeField(verbose_name='登録日時', default=timezone.now)
 
+
+#TODO:体重と身長を記録するモデルを作る。
+class Health(models.Model):
+    id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    #TODO:ここはunique_togetherで同じ日に登録できないようにするべきでは？
+    dt          = models.DateTimeField(verbose_name='登録日時', default=timezone.now) #TODO:←これはDateFieldにするべきでは？
+    user        = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="登録者",on_delete=models.CASCADE)
+
+    #この2つは入力が面倒にならないよう、最新の値を最初からinputタグのvalueに入れておく
+    weight      = models.IntegerField(verbose_name="体重(kg)")
+    height      = models.IntegerField(verbose_name="身長(cm)")
+
+#TODO:今月の目標を記録するモデルを作る
+class Target(models.Model):
+
+    id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    #TODO:ここはunique_togetherで？同じ月に複数登録できないようにするべきでは？←別途バリデーションを用意するという方法もあるかと？
+    dt          = models.DateTimeField(verbose_name='登録日時', default=timezone.now) #TODO:←これはDateFieldにするべきでは？
+    user        = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="登録者",on_delete=models.CASCADE)
+
+    title       = models.CharField(verbose_name="目標",max_length=30)
+
+    #目標達成できたら達成済みをチェックする(ここはあくまでも自己評価で)
+    done        = models.BooleanField(verbose_name="達成済み",default=False)

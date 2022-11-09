@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum
 from django.utils import timezone
 
-from .models import FitnessCategory,FitnessMemory,Menu,MenuDetail,Trophy,FoodCategory,FoodMemory
+from .models import FitnessCategory,FitnessMemory,Menu,MenuDetail,Trophy,FoodCategory,FoodMemory,Health,Target
 
 
 import datetime
@@ -16,19 +16,18 @@ class YearMonthForm(forms.Form):
     year    = forms.IntegerField()
     month   = forms.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
 
-
-
 class FoodCategoryForm(forms.ModelForm):
-
     class Meta:
         model   = FoodCategory
         fields  = ["name","user"]
 
 class FoodMemoryForm(forms.ModelForm):
-
     class Meta:
         model   = FoodMemory
         fields  = ["img","kcal","description","exe_dt","category","user",]
+
+
+
 
 
 
@@ -43,7 +42,6 @@ class FitnessMemoryForm(forms.ModelForm):
     class Meta:
         model   = FitnessMemory
         fields  = ["category","time","user","exe_dt"]
-
 
     #https://noauto-nolife.com/post/django-models-save-delete-override/
     def save(self, *args, **kwargs):
@@ -105,4 +103,20 @@ class MenuDetailForm(forms.ModelForm):
 
 class UUIDForm(forms.Form):
     id  = forms.UUIDField()
+
+
+
+#TODO:体重と身長を記録するモデルを作る。
+class HealthForm(forms.ModelForm):
+    class Meta:
+        model   = Health
+        fields  = ["user","weight","height",]
+
+
+class TargetForm(forms.ModelForm):
+    class Meta:
+        model   = Target
+        fields  = ["user","title",]
+
+
 

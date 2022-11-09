@@ -372,8 +372,9 @@ function fitness_memory_list_submit(details){
     let day     = ("0" + String(today.getDate()) ).slice(-2);
     let hour    = ("0" + String(today.getHours()) ).slice(-2);
     let minute  = ("0" + String(today.getMinutes()) ).slice(-2);
+    let second  = ("0" + String(today.getSeconds()) ).slice(-2);
 
-    let exe_dt  = year + "-" + month + "-" + day + " " + hour + ":" + minute;
+    let exe_dt  = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
 
 
     for (let detail of details){

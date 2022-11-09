@@ -13,4 +13,7 @@ urlpatterns = [
     path('menu/', views.menu, name="menu"),
     path('menu/<uuid:pk>/', views.menu, name="menu_single"),
 
+
+    path('target/', views.target, name="target"),
+    path('target/<uuid:pk>/', views.target, name="target_single"),
 ]

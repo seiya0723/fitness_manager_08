@@ -13,9 +13,8 @@ from django.utils import timezone
 
 
 from . import calendar
-from .models import FitnessCategory,FitnessMemory,FoodCategory,FoodMemory,Menu,MenuDetail,Trophy,TrophyUser
-from .forms import YearMonthForm,FitnessCategoryForm,FitnessMemoryForm,MenuForm,MenuDetailForm,UUIDForm,FoodCategoryForm,FoodMemoryForm
-
+from .models import FitnessCategory,FitnessMemory,FoodCategory,FoodMemory,Menu,MenuDetail,Trophy,TrophyUser,Target,Health
+from .forms import YearMonthForm,FitnessCategoryForm,FitnessMemoryForm,MenuForm,MenuDetailForm,UUIDForm,FoodCategoryForm,FoodMemoryForm,TargetForm,HealthForm
 
 import datetime
 
@@ -64,8 +63,9 @@ class HomeView(LoginRequiredMixin,View):
                 
                 query = Q(user=request.user.id, exe_dt__year=calendar_date.year, exe_dt__month=calendar_date.month, exe_dt__day=calendar_date.day)
 
-                date["memories"]        = FitnessMemory.objects.filter(query).order_by("dt")
-                date["food_memories"]   = FoodMemory.objects.filter(query).order_by("dt")
+                #TODO:ここで新しい順に並べる(横並びの部分の左が新しいデータになる。)
+                date["memories"]        = FitnessMemory.objects.filter(query).order_by("-dt")
+                date["food_memories"]   = FoodMemory.objects.filter(query).order_by("-dt")
 
                 #print(date["food_memories"])
 
@@ -173,9 +173,7 @@ class HomeView(LoginRequiredMixin,View):
             print("剥奪")
         """
 
-
-
-
+        context["target"]   = Target.objects.filter(dt__year=selected_date.year, dt__month=selected_date.month, user=request.user.id).order_by("-dt").first()
 
 
         return render(request, 'fitness/home.html' ,context)
@@ -485,8 +483,28 @@ class MenuView(LoginRequiredMixin,View):
 
 menu    = MenuView.as_view()
 
-"""
-class TrophyView(LoginRequiredMixin,View):
-class TrophyUserView(LoginRequiredMixin,View):
-"""
+
+class TargetView(LoginRequiredMixin,View):
+
+    def post(self, request, *args, **kwargs):
+
+        #kwargsを使った投稿と編集の両立
+        if "pk" in kwargs:
+            target      = Target.objects.filter(user=request.user.id).first()
+        else:
+            target      = Target()
+
+        copied          = request.POST.copy()
+        copied["user"]  = request.user.id
+
+        form    = TargetForm(copied, instance=target)
+
+        if form.is_valid():
+            form.save()
+
+        return redirect("fitness:home")
+
+target  = TargetView.as_view()
+
+
 
