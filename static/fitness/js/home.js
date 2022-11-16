@@ -15,7 +15,7 @@ window.addEventListener("load" , function (){
     $(document).on("click", ".menu_delete", function(){ menu_delete(this); });
     $(document).on("click", ".menu_edit_submit", function(){ menu_edit(this); });
     
-    //TODO:モーダルを表示した状態で更新すると表示されっぱなしになるので、ロードした時点で消しておく。
+    //モーダルを表示した状態で更新すると表示されっぱなしになるので、ロードした時点で消しておく。
     $("#modal_chk").prop("checked", false);
 
     //メニューの編集もチェックを消しておく。
@@ -51,16 +51,44 @@ window.addEventListener("load" , function (){
 
     let date    = year + "-" + month + "-" + day + " " + hour + ":" + minute;
 
-    let config_date = { 
+    let config_dt = { 
         locale: "ja",
-                enableTime: true,
+        enableTime: true,
         dateFormat: "Y-m-d H:i",
         defaultDate: date,
     }
-    flatpickr("[name='exe_dt']",config_date);
+    flatpickr("[name='exe_dt']",config_dt);
 
+    let config_date = { 
+        locale: "ja",
+        dateFormat: "Y-m-d",
+        defaultDate: date,
+    }
+    flatpickr("[name='date']",config_date);
 
     $(document).on("click", "#fitness_memory_submit", function() { fitness_memory_submit(this) });
+
+
+    //TODO:カレンダーの日付をクリックした時、日ごとのページへジャンプする
+    $(document).on("click",".calendar_day_area", function(){
+        //日付を抜き取る
+        let day = $(this).children(".calendar_day").text();
+
+        //データがない場合はアーリーリターン
+        if (!$("#day_"+day).length){ return false; }
+
+        //日ごとにチェックを入れる
+        $("#tab_radio_2").prop("checked",true);
+
+        //スクロールする
+        //参照元: https://qiita.com/yamaguchi_takashi/items/edce735e825631993a74
+        $("html,body").animate({scrollTop:$("#day_"+day).offset().top}, 100);
+    });
+
+
+
+    $(document).on("click", ".target_done", function(){ target_done(this); });
+
 
 });
 
@@ -157,177 +185,6 @@ function menu_edit(elem){
 
 }
 
-/*
-function watch_pre_start(elem){
-
-    let form_elem   = $(elem).parents("form");
-
-    let categories  = $(form_elem).children("[name='category']");
-    let length      = categories.length;
-
-    for (let i=0;i<length;i++){
-        let dic         = {};
-
-        dic["category"] = categories.eq(i).val();
-        dic["name"]     = categories.eq(i).children("option:selected").text();
-
-        if ( dic["category"] === ""){
-            return false;
-        }
-        console.log(dic)
-        MENU_DETAILS.push(dic);
-    }
-    console.log(MENU_DETAILS);
-
-    //モーダルを表示
-    $("#modal_chk").prop("checked",true);
-
-    menu_start(watch=true);
-}
-
-function menu_pre_start(elem){
-
-    let form_elem   = $(elem).parents("form");
-
-    let categories  = $(form_elem).children("[name='category']");
-    let names       = $(form_elem).children("[name='category_name']");
-    let times       = $(form_elem).children("[name='time']");
-
-    let length      = categories.length;
-
-    for (let i=0;i<length;i++){
-        let dic     = {};
-
-        dic["category"] = categories.eq(i).val();
-        dic["name"]     = names.eq(i).val();
-        dic["time"]     = times.eq(i).val();
-
-        MENU_DETAILS.push(dic);
-    }
-
-    console.log(MENU_DETAILS);
-
-    //モーダルを表示
-    $("#modal_chk").prop("checked",true);
-
-    menu_start();
-}
-function menu_start(watch=false){
-        
-    if (watch){
-        console.log("ストップウォッチ")
-    }
-    else{
-        console.log("メニュー")
-    }
-
-
-    //バグ2:バグ1を直すためにloadに入れる。ただ、timerがローカル変数になっているので、グローバル変数にする。
-
-    //Timerオブジェクトを作る←グローバル変数化して、上書きすれば良いのでは？
-    let timer = new Timer();
-
-    //バグ1:ここでイベントをセットすると、ストップウォッチもしくはタイマーを起動するたびに↓のイベントがセットされていく。多重に処理が実行されてしまう。冒頭のloadに入れて1回だけ実行
-
-    //モーダルを閉じる時、タイマーをストップして初期化。
-    $(document).on("click", ".modal_label" , function(){ 
-        //watchであれば閉じる時に記録しておく
-
-        //バグ4:このwatchをグローバル変数WATCHに仕立てる。loadに入れると参照できなくなるので
-        if (watch){
-            console.log("ストップウォッチなので投稿する。")
-            MENU_DETAILS[DOING_DETAIL]["time"] = $('#remain').text();
-            fitness_memory_list_submit(MENU_DETAILS);
-        }
-        DOING_DETAIL = 0;
-        MENU_DETAILS = [];
-
-        //FIXME:おそらくここでストップウォッチがストップされた状態で終わっている。次に何かTimerを動かすとこの状態からスタートしてしまう？
-        timer.stop();
-
-        $("#timer_pause").children(".fa-play").css({"display":"none"});
-        $("#timer_pause").children(".fa-pause").css({"display":"inline"});
-    }); 
-    
-    //ポーズするときのイベント
-    $(document).on("click", "#timer_pause" , function(){ 
-        //参照元: https://stackoverflow.com/questions/58050820/how-to-know-if-easytimer-is-stopped-or-not
-        //isRunning()で動作中かどうかを判定できる
-        if (timer.isRunning()){
-            timer.pause();
-            $(this).val("再開");
-
-            // TODO:ここでfontawesomeの再生と一時停止のアイコンを表示非表示させる
-            //次回レッスンまでにfontawesomeの実装
-            $(this).children(".fa-play").css({"display":"inline"});
-            $(this).children(".fa-pause").css({"display":"none"});
-
-            //バグ3:この一時停止の装飾をモーダルを閉じるときにも実行する、ただし、thisは使えない。
-            $("#timer_pause").children(".fa-play").css({"display":"inline"});
-            $("#timer_pause").children(".fa-pause").css({"display":"none"});
-        }
-        else{
-            timer.start();
-            $(this).val("一時停止");
-            $(this).children(".fa-play").css({"display":"none"});
-            $(this).children(".fa-pause").css({"display":"inline"});
-
-            $("#timer_pause").children(".fa-play").css({"display":"none"});
-            $("#timer_pause").children(".fa-pause").css({"display":"inline"});
-
-        }
-    });
-
-    //現在実行中のMenuDetailのindex番号がはみ出ている時、0に戻してreturnを実行する
-    if ( MENU_DETAILS.length <= DOING_DETAIL ){
-        DOING_DETAIL = 0;
-
-        //TODO:ここで実行したフィットネスの記録をするAjaxを実行
-        fitness_memory_list_submit(MENU_DETAILS);
-        return;
-    }
-
-    //timerのセット
-    if (watch){
-        timer.start();
-    }
-    else{
-        timer.start({countdown: true, startValues: {seconds: MENU_DETAILS[DOING_DETAIL]["time"] }});
-    }
-
-    //時間とカテゴリの表示
-    $("#doing_category").html(MENU_DETAILS[DOING_DETAIL]["name"]);
-    $('#remain').html(timer.getTimeValues().toString());
-
-
-    //バグ5:timerをグローバル変数化するので、ここにイベントをセットすると多重に実行されてしまう。これもloadに入れる。
-
-    //時間経過したときのイベント
-    timer.addEventListener('secondsUpdated', function (e) {
-        $('#remain').html(timer.getTimeValues().toString());
-    });
-
-    //カウントダウン終了時のイベント
-    timer.addEventListener('targetAchieved', function (e) {
-        //1個のMenuDetail終了時、次のMenuDetailに行くため、DOING_DETAILを1加算して、start_menu()を実行する
-        DOING_DETAIL += 1;
-        menu_start();
-
-        //TODO:もしメニュー1個完了時の時刻を記録したい場合は、ここにMENU_DETAILS[DOING_DETAIL]["exe_dt"]に実行時間を記録する
-
-        //ここで音楽を鳴らす
-        play_music(ALARM);
-    });
-
-}
-function play_music(url) {
-    let sound       = new Audio();
-    sound.onerror   = function() { console.log("再生できませんでした"); }   
-    sound.src       = url;
-    sound.play();
-}
-*/
-
 
 //手動記録用
 function fitness_memory_submit(elem){
@@ -418,3 +275,32 @@ function fitness_memory_list_submit(details){
 
 }
 
+//目標を完了にさせる
+function target_done(form_elem){
+
+    let data        = new FormData( $(form_elem).get(0) );
+    let url         = $(form_elem).prop("action");
+    let method      = "PATCH";
+
+    $.ajax({
+        url: url,
+        type: method,
+        data: data,
+        processData: false,
+        contentType: false,
+        dataType: 'json'
+    }).done( function(data, status, xhr ) { 
+
+        if (!data.error){
+            console.log("投稿完了")
+        }
+        else{
+            console.log("ERROR");
+        }
+
+    }).fail( function(xhr, status, error) {
+        console.log(status + ":" + error );
+    }); 
+
+
+}

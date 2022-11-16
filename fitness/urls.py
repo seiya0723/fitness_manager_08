@@ -16,4 +16,7 @@ urlpatterns = [
 
     path('target/', views.target, name="target"),
     path('target/<uuid:pk>/', views.target, name="target_single"),
+
+    path("health/", views.health, name="health"),
+
 ]

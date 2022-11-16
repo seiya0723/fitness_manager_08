@@ -181,11 +181,14 @@ class Health(models.Model):
 
     #TODO:ここはunique_togetherで同じ日に登録できないようにするべきでは？
     dt          = models.DateTimeField(verbose_name='登録日時', default=timezone.now) #TODO:←これはDateFieldにするべきでは？
+    date        = models.DateField(verbose_name='記録日')
     user        = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="登録者",on_delete=models.CASCADE)
 
     #この2つは入力が面倒にならないよう、最新の値を最初からinputタグのvalueに入れておく
     weight      = models.IntegerField(verbose_name="体重(kg)")
     height      = models.IntegerField(verbose_name="身長(cm)")
+
+
 
 #TODO:今月の目標を記録するモデルを作る
 class Target(models.Model):

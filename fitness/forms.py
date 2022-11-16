@@ -110,7 +110,7 @@ class UUIDForm(forms.Form):
 class HealthForm(forms.ModelForm):
     class Meta:
         model   = Health
-        fields  = ["user","weight","height",]
+        fields  = ["user","weight","height","date"]
 
 
 class TargetForm(forms.ModelForm):

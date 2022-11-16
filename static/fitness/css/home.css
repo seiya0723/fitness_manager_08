@@ -238,15 +238,11 @@ input[type="radio"]#tab_radio_5:checked ~ #tab_area_5 { display:block; }
 .menu_edit_chk[type="checkbox"]:checked ~ .menu_content { display:none; }
 
 
-
-
 /* sortable */
-
 .menu_detail_create_row{
     margin:0.25rem 0;
     padding:0.25rem; 
 }
-
 .handle {
     font-size:1.5rem;
     cursor:pointer;
@@ -258,9 +254,6 @@ input[type="radio"]#tab_radio_5:checked ~ #tab_area_5 { display:block; }
 .menu_detail_dragging{
     background:orange;
 }
-
-
-
 
 
 /* sp bottom menu */
@@ -309,6 +302,7 @@ input[type="radio"]#tab_radio_5:checked ~ #tab_area_5 { display:block; }
 
 
 
+/* TODO:この横並びは統一させたほうが良いのでは？ */
 
 /* 日ごとの横並べ */
 .fitness_memory_area {
@@ -358,17 +352,30 @@ input[type="radio"]#tab_radio_5:checked ~ #tab_area_5 { display:block; }
 .food_memory_name{
     font-size:1.2rem;
     font-weight:bold;
+
+
+    /* 一旦ここで、折返し*/
+    width:10rem;
+    white-space:initial;
 }
+
+/* TODO:この中央寄せだと画像以外の要素が長いと中央寄せにならない←折り返す？もしくは、切り詰める？ */
 .food_memory_image{
     width:10rem;
     height:10rem;
 
     display: table-cell;
     vertical-align: middle;
+    text-align:center;
+
 }
 .food_memory_image img{
+    display:block;
+
     max-width:100%;
     max-height:10rem;
+
+    margin:auto;
 
     /* サイズの小さい画像を中央に寄せる */ 
     /*
@@ -377,9 +384,43 @@ input[type="radio"]#tab_radio_5:checked ~ #tab_area_5 { display:block; }
     left:50%;
     transform:translate(-50%, -50%);
     */
-
 }
 .food_memory_description{
     font-size:0.85rem;
 }
+
+
+/* 今月の目標 */
+.target_chk { display:none; }
+.target_title_area {
+    display:flex;
+    font-size:2.5rem;
+    justify-content:space-between;
+}
+.target_label{
+    display:inline-block;
+    width:3rem;
+    cursor:pointer;
+}
+.target_done{
+    display:inline-block;
+    width:3rem;
+    cursor:pointer;
+}
+.target_edit_area{
+    width:7rem;
+}
+.target_title{
+    width:calc(100%-7rem);
+    font-weight:bold;
+}
+.target_title_form{
+    width:calc(100%-7rem);
+    display:none;
+}
+
+.target_chk[type="checkbox"]:checked ~ .target_title_area > .target_title { display:none; }
+.target_chk[type="checkbox"]:checked ~ .target_title_area > .target_title_form { display:block; }
+
+
 

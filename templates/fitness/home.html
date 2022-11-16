@@ -85,8 +85,8 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                     <tr>
                         {% for date in week_date %}
                         {# 今日の日付に背景色を加える #}
-                        {# TODO:tdをクリックした時、日ごとのタブに切り替え、スクロールするJSを発動 #}
-                        <td {% if today == date.day %}style="background:orange;"{% endif %}>
+                        {# TODO:tdをクリックした時、日ごとのタブに切り替え、スクロールするJSを発動。←cursor:pointerを入れても良いのでは？ #}
+                        <td class="calendar_day_area" {% if today == date.day %}style="background:orange;"{% endif %}>
                             <div class="calendar_day">{{ date.day.day }}</div>
 
                             {# ここにフィットネスをしていればアイコンを表示 #}
@@ -131,26 +131,57 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                 {# TODO: ここはcheckboxを使ってフォームと目標の表示を切り替える形式にする。 #}
 
 
-                <input id="target_chk" type="checkbox">
-                <label for="target_chk" class="target_label">編集</label>
-                <div>{{ target.title }}</div>
+                <input id="target_chk" class="target_chk" type="checkbox">
 
-                <form action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}" method="POST">
-                    {% csrf_token %}
-                    <input type="text" name="title" placeholder="今月の目標を指定してください" value="{% if target %}{{ target.title }}{% endif %}">
-                    <input type="submit" value="送信">
-                </form>
+                <div class="target_title_area">
+                    <div class="target_title">{% if target %}{{ target.title }}{% else %}今月の目標を指定してください{% endif %}</div>
+                    <div class="target_title_form">
+                        <form action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}" method="POST">
+                            {% csrf_token %}
+                            <input type="text" name="title" placeholder="今月の目標を指定してください" value="{% if target %}{{ target.title }}{% endif %}">
+                            <input type="submit" value="送信">
+                        </form>
+                    </div>
 
+                    <div class="target_edit_area">
+
+                        <form class="target_done" action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}">
+                            {% csrf_token %}
+                            {# TODO:square だと編集アイコンとのズレが気になるのでcircleにした #}
+                            {% if target.done %}
+                            <i class="fa-regular fa-circle-check"></i>
+                            {% else %}
+                            <i class="fa-regular fa-circle"></i>
+                            {% endif %}
+                        </form>
+                        <label for="target_chk" class="target_label"><i class="fa-regular fa-pen-to-square"></i></label>
+                    </div>
+
+                </div>
 
                 <h2>トロフィー一覧</h2>
 
+                {% comment %}
                 {% for trophy in trophies %}
                 <div>{{ trophy.name }}</div>
                 <div>
                     <img src="{{ trophy.img.url }}" alt="">
                 </div>
                 {% endfor %}
+                {% endcomment %}
 
+                <div class="food_memory_area">
+
+                    {% for trophy in trophies %}
+                    <div class="food_memory_content">
+                        <div class="food_memory_image"><img src="{{ trophy.img.url }}" alt="食事画像"></div>
+                        <div class="food_memory_name">{{ trophy.name }}</div>
+                    </div>
+                    {% empty %}
+                    <div class="">フードデータ無し</div>
+                    {% endfor %}
+
+                </div>
 
                 <h2>連続日数</h2>
 
@@ -158,6 +189,16 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                 {% if serial >= 2 %}
                 <div>{{ serial }}日連続フィットネス中！！</div>
                 {% endif %}
+
+                <h2>体重・身長</h2>
+
+                <form action="{% url 'fitness:health' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="number" name="weight" value="{{ health.weight }}" placeholder="体重">
+                    <input type="number" name="height" value="{{ health.height }}" placeholder="身長">
+                    <input type="text" name="date">
+                    <input type="submit" value="送信">
+                </form>
 
             </div>
             <div id="tab_area_2" class="tab_area">
@@ -171,7 +212,8 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                 {% if date.memories or date.food_memories %} {# ←やった日だけ表示させたい場合はこちら #}
                 {# {% if date.day %} #} {# ←全ての日を表示させたい場合はこちら #}
                 <div>
-                    <h3>{{ date.day }}</h3>
+                    {# TODO:カレンダーをクリックした時、ここのidに移動する #}
+                    <h3 id="day_{{ date.day.day }}">{{ date.day }}</h3>
 
                     <h4>フィットネスデータ</h4>
 
@@ -197,7 +239,9 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         {% for food_memory in date.food_memories %}
                         <div class="food_memory_content">
                             <div class="food_memory_name">{{ food_memory.category.name }}</div>
+                            {% if food_memory.img %}
                             <div class="food_memory_image"><img src="{{ food_memory.img.url }}" alt="食事画像"></div>
+                            {% endif %}
                             <div class="food_memory_description">{{ food_memory.description }}</div>
                             <div class="food_memory_kcal">{{ food_memory.kcal }} kcal</div>
                             <div class="food_memory_exe_dt">{{ food_memory.exe_dt|date:"H時i分" }}</div>
@@ -242,7 +286,6 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         </tr>
                     </tbody>
                 </table>
-
 
             </div>
             <div id="tab_area_4" class="tab_area">

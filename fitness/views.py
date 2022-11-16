@@ -82,8 +82,6 @@ class HomeView(LoginRequiredMixin,View):
 
 
         context["month_date"]   = month_date
-
-
         context["trophies"]     = Trophy.objects.filter(user=request.user.id).order_by("-dt")
 
 
@@ -174,6 +172,10 @@ class HomeView(LoginRequiredMixin,View):
         """
 
         context["target"]   = Target.objects.filter(dt__year=selected_date.year, dt__month=selected_date.month, user=request.user.id).order_by("-dt").first()
+
+
+        
+        context["health"]   = Health.objects.order_by("-dt").first()
 
 
         return render(request, 'fitness/home.html' ,context)
@@ -490,7 +492,7 @@ class TargetView(LoginRequiredMixin,View):
 
         #kwargsを使った投稿と編集の両立
         if "pk" in kwargs:
-            target      = Target.objects.filter(user=request.user.id).first()
+            target      = Target.objects.filter(user=request.user.id, id=kwargs["pk"]).first()
         else:
             target      = Target()
 
@@ -504,7 +506,37 @@ class TargetView(LoginRequiredMixin,View):
 
         return redirect("fitness:home")
 
+    def patch(self, request, *args, **kwargs):
+
+        data    = {"error":True}
+
+        if "pk" not in kwargs:
+            return JsonResponse(data)
+
+        target      = Target.objects.filter(user=request.user.id, id=kwargs["pk"]).first()
+        target.done = not target.done
+        target.save()
+
+
+        data["error"]   = True
+
+        return JsonResponse(data)
+
 target  = TargetView.as_view()
 
+class HealthView(LoginRequiredMixin,View):
 
+    def post(self, request, *args, **kwargs):
+
+        copied          = request.POST.copy()
+        copied["user"]  = request.user.id
+
+        form    = HealthForm(copied)
+
+        if form.is_valid():
+            form.save()
+
+        return redirect("fitness:home")
+
+health  = HealthView.as_view()
 
