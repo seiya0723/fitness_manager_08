@@ -24,7 +24,7 @@ class FoodCategoryForm(forms.ModelForm):
 class FoodMemoryForm(forms.ModelForm):
     class Meta:
         model   = FoodMemory
-        fields  = ["img","kcal","description","exe_dt","category","user",]
+        fields  = ["img","kcal","exe_dt","category","user",]
 
 
 
@@ -116,7 +116,7 @@ class HealthForm(forms.ModelForm):
 class TargetForm(forms.ModelForm):
     class Meta:
         model   = Target
-        fields  = ["user","title",]
+        fields  = ["user","title","date"]
 
 
 

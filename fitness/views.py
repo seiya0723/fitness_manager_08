@@ -18,6 +18,11 @@ from .forms import YearMonthForm,FitnessCategoryForm,FitnessMemoryForm,MenuForm,
 
 import datetime
 
+
+#TODO:django message framework 実装
+from django.contrib import messages
+
+
 class HomeView(LoginRequiredMixin,View):
 
     def get(self, request, *args, **kwargs):
@@ -63,19 +68,20 @@ class HomeView(LoginRequiredMixin,View):
                 
                 query = Q(user=request.user.id, exe_dt__year=calendar_date.year, exe_dt__month=calendar_date.month, exe_dt__day=calendar_date.day)
 
-                #TODO:ここで新しい順に並べる(横並びの部分の左が新しいデータになる。)
+                #ここで新しい順に並べる(横並びの部分の左が新しいデータになる。)
                 date["memories"]        = FitnessMemory.objects.filter(query).order_by("-dt")
                 date["food_memories"]   = FoodMemory.objects.filter(query).order_by("-dt")
 
                 #print(date["food_memories"])
 
-                #TODO:日ごとの合計を記録
+                #日ごとの合計を記録
                 memories_total          = FitnessMemory.objects.filter(query).order_by("dt").aggregate(Sum("time"))
 
                 #このmemories_total["time__sum"]にはtimedeltaのオブジェクトが入っている、もしデータがない場合はNone
                 if memories_total["time__sum"]:
-                    # chart.jsでは時間でグラフを作れない。秒に統一させる(分単位で出したい場合は↓を60で割る、もしくはJS側で60で割る)
-                    date["memories_total"]  = memories_total["time__sum"].total_seconds()
+                    # TODO:chart.jsでは時間でグラフを作れない。秒に統一させる(分単位で出したい場合は↓を60で割る、もしくはJS側で60で割る)
+                    #date["memories_total"]  = memories_total["time__sum"].total_seconds() 
+                    date["memories_total"]  = memories_total["time__sum"].total_seconds() // 60
                 else:
                     date["memories_total"]  = 0
 
@@ -99,7 +105,10 @@ class HomeView(LoginRequiredMixin,View):
             if fitness["time__sum"]:
 
                 dic["time"]         = fitness["time__sum"]
-                dic["time_second"]  = fitness["time__sum"].total_seconds()
+
+                #TODO:分単位にするため60で割って切り捨て
+                #dic["time_second"]  = fitness["time__sum"].total_seconds()
+                dic["time_second"]  = fitness["time__sum"].total_seconds() // 60
 
                 #カテゴリの合計がある場合、合計に加算
                 month_category_total_times += fitness["time__sum"]
@@ -130,7 +139,10 @@ class HomeView(LoginRequiredMixin,View):
 
             if fitness["time__sum"]:
                 dic["time"]         = fitness["time__sum"]
-                dic["time_second"]  = fitness["time__sum"].total_seconds()
+
+                #TODO:グラフの分単位表示のため、60で割って切り捨てる
+                #dic["time_second"]  = fitness["time__sum"].total_seconds()
+                dic["time_second"]  = fitness["time__sum"].total_seconds() // 60
             else:
                 dic["time"]         = 0
                 dic["time_second"]  = 0
@@ -175,7 +187,8 @@ class HomeView(LoginRequiredMixin,View):
 
 
         
-        context["health"]   = Health.objects.order_by("-dt").first()
+        context["healthes"] = Health.objects.filter(user=request.user.id, date__year=selected_date.year, date__month=selected_date.month ).order_by("dt")
+        context["health"]   = Health.objects.filter(user=request.user.id ).order_by("-dt").first()
 
 
         return render(request, 'fitness/home.html' ,context)
@@ -518,7 +531,7 @@ class TargetView(LoginRequiredMixin,View):
         target.save()
 
 
-        data["error"]   = True
+        data["error"]   = False
 
         return JsonResponse(data)
 

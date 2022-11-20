@@ -26,6 +26,9 @@
     {# chart.js #}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
+    {# duration-picker  クラス名にhtml-duration-pickerを追加するだけ #}
+    <script src="https://cdn.jsdelivr.net/npm/html-duration-picker@latest/dist/html-duration-picker.min.js"></script>
+
     <link rel="stylesheet" href="{% static 'fitness/css/home.css' %}">
 
     <script src="{% static 'common/js/ajax.js' %}"></script>
@@ -86,18 +89,24 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         {% for date in week_date %}
                         {# 今日の日付に背景色を加える #}
                         {# TODO:tdをクリックした時、日ごとのタブに切り替え、スクロールするJSを発動。←cursor:pointerを入れても良いのでは？ #}
-                        <td class="calendar_day_area" {% if today == date.day %}style="background:orange;"{% endif %}>
+                        <td class="
+                            {% if date.food_memories or date.memories %}
+                            calendar_day_exist
+                            {% endif %}" {% if today == date.day %}style="background:orange;"{% endif %}>
                             <div class="calendar_day">{{ date.day.day }}</div>
 
                             {# ここにフィットネスをしていればアイコンを表示 #}
                             <div class="calendar_icon_area">
                                 <div class="calendar_icon">{% if date.food_memories %}<i class="fa-solid fa-utensils"></i>{% endif %}</div>
                                 <div class="calendar_icon">{% if date.memories %}<i class="fa-solid fa-dumbbell"></i>{% endif %}</div>
+
                             </div>
 
                             {% if date.day.day %}
                             {# 1日のフィットネス時間の合計を表示 #}
                             <div class="daily_graph_day" style="display:none;">{{ date.day.day }}</div>
+
+                            {# この部分を分単位で計算した結果を入れる #}
                             <div class="daily_graph_total" style="display:none;">{{ date.memories_total }}</div>
                             {% endif %}
 
@@ -135,16 +144,20 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <div class="target_title_area">
                     <div class="target_title">{% if target %}{{ target.title }}{% else %}今月の目標を指定してください{% endif %}</div>
+
+
                     <div class="target_title_form">
                         <form action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}" method="POST">
                             {% csrf_token %}
                             <input type="text" name="title" placeholder="今月の目標を指定してください" value="{% if target %}{{ target.title }}{% endif %}">
+
+                            {# ここでname属性がdateになっているため、flatpickrが発動してしまう。type=hiddenにしたのに。flatpickr側を修正する。 #}
+                            {# <input type="hidden" name="date" value="{{ selected_date }}"> #}
                             <input type="submit" value="送信">
                         </form>
                     </div>
 
                     <div class="target_edit_area">
-
                         <form class="target_done" action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}">
                             {% csrf_token %}
                             {# TODO:square だと編集アイコンとのズレが気になるのでcircleにした #}
@@ -161,15 +174,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <h2>トロフィー一覧</h2>
 
-                {% comment %}
-                {% for trophy in trophies %}
-                <div>{{ trophy.name }}</div>
-                <div>
-                    <img src="{{ trophy.img.url }}" alt="">
-                </div>
-                {% endfor %}
-                {% endcomment %}
-
+                {# TODO:ここの名前を変える #}
                 <div class="food_memory_area">
 
                     {% for trophy in trophies %}
@@ -178,7 +183,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         <div class="food_memory_name">{{ trophy.name }}</div>
                     </div>
                     {% empty %}
-                    <div class="">フードデータ無し</div>
+                    <div class="">トロフィー無し</div>
                     {% endfor %}
 
                 </div>
@@ -194,11 +199,45 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <form action="{% url 'fitness:health' %}" method="POST">
                     {% csrf_token %}
-                    <input type="number" name="weight" value="{{ health.weight }}" placeholder="体重">
-                    <input type="number" name="height" value="{{ health.height }}" placeholder="身長">
+                    {# step="0.1"とすることで小数第一位までの入力を許可できる #}
+                    <input type="number" name="weight" value="{{ health.weight }}" placeholder="体重(kg)" step="0.1">
+                    <input type="number" name="height" value="{{ health.height }}" placeholder="身長(cm)" step="0.1">
                     <input type="text" name="date">
                     <input type="submit" value="送信">
                 </form>
+
+                <table class="table my-2">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>記録日</th>
+                            <th>体重(kg)</th>
+                            <th>身長(cm)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for health in healthes %}
+                        <tr>
+                            <td>{{ health.date }}</td>
+                            <td>{{ health.weight }} kg</td>
+                            <td>{{ health.height }} cm</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td>データなし</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h2>設定</h2>
+
+
+                {# TODO:一旦音量のフォームだけ実装。音量変更機能はない。 #}
+                <h3>音量設定</h3>
+
+                <input class="form_range" type="range" max="100" min="0">
 
             </div>
             <div id="tab_area_2" class="tab_area">
@@ -347,6 +386,14 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         </div>
                     </div>
                 </form>
+
+                {# 投稿されたフードカテゴリ一覧 #}
+                {% comment %}
+                {% for food_category in food_categories %}
+                <div>{{ food_category.name }}</div>
+                {% endfor %}
+                {% endcomment %}
+
             </div>
             <div class="container_area">
 
@@ -386,6 +433,14 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                     </div>
                     <input class="" type="submit" value="送信">
                 </form>
+
+                {# 投稿されたフィットネスカテゴリ一覧 #}
+                {% comment %}
+                {% for category in categories %}
+                <div>{{ category.name }} : {{ category.kcal }}kcal</div>
+                {% endfor %}
+                {% endcomment %}
+
             </div>
 
             <div class="container_area">
@@ -407,7 +462,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                             </select>
                         </div>
                         <div class="col-sm-6">
-                            <input class="form-control" type="text" name="time" placeholder="00:00:00">
+                            <input class="form-control html-duration-picker" type="text" name="time" placeholder="00:00:00">
                         </div>
                     </div>
                     <input id="fitness_memory_submit" type="button" value="送信">
@@ -430,14 +485,10 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         <input id="watch_start" class="form-control" type="button" value="スタート">
                     </div>
                 </form>
-
             </div>
 
-
             <div id="menu" class="container_area">
-
                 <h2>フィットネスメニュー新規作成</h2>
-
                 {# ↓MenuDetailのフォームの原型。これをJSで#menu_detail_create_formに追加する #}
                 <div id="menu_detail_create_init" class="menu_detail_create_init">
 

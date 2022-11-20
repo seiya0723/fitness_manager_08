@@ -32,7 +32,7 @@ function draw_daily_graph(){
         data: {
             labels: days,
             datasets: [{
-                label: "運動時間(秒)",
+                label: "運動時間(分)",
                 data: totals,
                 backgroundColor: "orange",
                 borderWidth: 1
@@ -58,6 +58,7 @@ function draw_month_category_graph(){
     let categories  = [];
     let times       = [];
 
+
     for (let category_elem of category_elems){
         categories.push(category_elem.innerText);
     }
@@ -65,13 +66,14 @@ function draw_month_category_graph(){
         times.push(time_elem.innerText);
     }
 
+
     const ctx = document.getElementById("month_category_graph").getContext('2d');
     const myChart = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: categories,
             datasets: [{
-                label: "運動時間(秒)",
+                label: "運動時間(分)",
                 data: times,
                 backgroundColor: "orange",
                 borderWidth: 1
@@ -114,7 +116,7 @@ function draw_year_total_graph(){
         data: {
             labels: months,
             datasets: [{
-                label: "運動時間(秒)",
+                label: "運動時間(分)",
                 data: totals,
                 backgroundColor: "orange",
                 borderWidth: 1

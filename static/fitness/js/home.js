@@ -57,6 +57,7 @@ window.addEventListener("load" , function (){
         dateFormat: "Y-m-d H:i",
         defaultDate: date,
     }
+    //TODO:クラス名で指定する flatpickr_dt
     flatpickr("[name='exe_dt']",config_dt);
 
     let config_date = { 
@@ -64,18 +65,16 @@ window.addEventListener("load" , function (){
         dateFormat: "Y-m-d",
         defaultDate: date,
     }
+    //TODO:クラス名で指定する flatpickr_date
     flatpickr("[name='date']",config_date);
 
     $(document).on("click", "#fitness_memory_submit", function() { fitness_memory_submit(this) });
 
 
     //TODO:カレンダーの日付をクリックした時、日ごとのページへジャンプする
-    $(document).on("click",".calendar_day_area", function(){
+    $(document).on("click",".calendar_day_exist", function(){
         //日付を抜き取る
         let day = $(this).children(".calendar_day").text();
-
-        //データがない場合はアーリーリターン
-        if (!$("#day_"+day).length){ return false; }
 
         //日ごとにチェックを入れる
         $("#tab_radio_2").prop("checked",true);
@@ -88,7 +87,6 @@ window.addEventListener("load" , function (){
 
 
     $(document).on("click", ".target_done", function(){ target_done(this); });
-
 
 });
 

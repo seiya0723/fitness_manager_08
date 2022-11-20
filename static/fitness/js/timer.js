@@ -210,9 +210,8 @@ function play_music(url) {
     //別で音声再生中、音がならないことがある。
 
     let sound       = new Audio();
-    sound.onerror   = function() { console.log("再生できませんでした"); }   
+    sound.onerror   = function() { console.log("再生できませんでした"); }
     sound.src       = url;
     sound.play();
 
 }
-
