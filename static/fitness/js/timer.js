@@ -212,6 +212,7 @@ function play_music(url) {
     let sound       = new Audio();
     sound.onerror   = function() { console.log("再生できませんでした"); }
     sound.src       = url;
+    sound.volume    = $(".volume_input").val();
     sound.play();
 
 }

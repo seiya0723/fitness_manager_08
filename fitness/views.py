@@ -26,7 +26,6 @@ from django.contrib import messages
 class HomeView(LoginRequiredMixin,View):
 
     def get(self, request, *args, **kwargs):
-
         context = {}
 
         #カレンダーの表示
@@ -183,7 +182,7 @@ class HomeView(LoginRequiredMixin,View):
             print("剥奪")
         """
 
-        context["target"]   = Target.objects.filter(dt__year=selected_date.year, dt__month=selected_date.month, user=request.user.id).order_by("-dt").first()
+        context["target"]   = Target.objects.filter(date__year=selected_date.year, date__month=selected_date.month, user=request.user.id).order_by("-dt").first()
 
 
         
@@ -209,6 +208,8 @@ class FitnessCategoryView(LoginRequiredMixin,View):
 
         if form.is_valid():
             form.save()
+
+            messages.success(request, "フィットネスカテゴリを登録しました")
 
         return redirect("fitness:home")
 
@@ -251,6 +252,7 @@ class FitnessMemoryView(LoginRequiredMixin,View):
             if form.is_valid():
                 print("保存")
                 form.save()
+                messages.success(request, "フィットネスを登録しました")
             else:
                 print(form.errors)
 
@@ -293,6 +295,7 @@ class FoodCategoryView(LoginRequiredMixin,View):
 
         data["error"]   = False
         form.save()
+        messages.success(request, "フードカテゴリを登録しました")
 
         return redirect("fitness:home")
 
@@ -329,6 +332,7 @@ class FoodMemoryView(LoginRequiredMixin,View):
         data["error"]   = False
         food = form.save()
         print(food)
+        messages.success(request, "フードを登録しました")
 
         return redirect("fitness:home")
 
@@ -401,6 +405,8 @@ class MenuView(LoginRequiredMixin,View):
         data["content"]     = self.render_menu(request,context)
         data["error"]       = False
 
+        messages.success(request, "フィットネスメニューを登録しました")
+
         return JsonResponse(data)
 
     #この編集はMenuとMenuDetailの編集を兼ねる
@@ -467,6 +473,9 @@ class MenuView(LoginRequiredMixin,View):
         data["content"]     = self.render_menu(request,context)
         data["error"]       = False
 
+        messages.success(request, "フィットネスメニューを編集しました")
+
+
         return JsonResponse(data)
         
     #ここの削除はMenuとMenuDetailの削除を兼ねる
@@ -501,7 +510,17 @@ menu    = MenuView.as_view()
 
 class TargetView(LoginRequiredMixin,View):
 
+    def render_target(self,request,context):
+
+        #ここでselected_dateは使えないので、form.save()の返り値から受け取る
+        #context["target"]   = Target.objects.filter(date__year=selected_date.year, date__month=selected_date.month, user=request.user.id).order_by("-dt").first()
+
+        return render_to_string("fitness/parts/target.html", context, request)
+
     def post(self, request, *args, **kwargs):
+
+        data    = {"error":True}
+        context = {}
 
         #kwargsを使った投稿と編集の両立
         if "pk" in kwargs:
@@ -515,13 +534,21 @@ class TargetView(LoginRequiredMixin,View):
         form    = TargetForm(copied, instance=target)
 
         if form.is_valid():
-            form.save()
+            target      = form.save()
+            messages.success(request, "今月の目標を登録しました")
 
-        return redirect("fitness:home")
+
+        context["target"]   = target
+
+        data["content"]     = self.render_target(request,context)
+        data["error"]       = False
+
+        return JsonResponse(data)
 
     def patch(self, request, *args, **kwargs):
 
         data    = {"error":True}
+        context = {}
 
         if "pk" not in kwargs:
             return JsonResponse(data)
@@ -530,8 +557,13 @@ class TargetView(LoginRequiredMixin,View):
         target.done = not target.done
         target.save()
 
+        print(target)
+        print(target.done)
 
-        data["error"]   = False
+        context["target"]   = target
+
+        data["content"]     = self.render_target(request,context)
+        data["error"]       = False
 
         return JsonResponse(data)
 

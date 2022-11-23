@@ -8,6 +8,10 @@
     <title>フィットネス</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+
+    {# TODO:favicon.ico のセット #}
+    <link href="{% static 'fitness/image/favicon.ico' %}" rel="icon">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -137,39 +141,8 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <h2>今月の目標</h2>
 
-                {# TODO: ここはcheckboxを使ってフォームと目標の表示を切り替える形式にする。 #}
-
-
-                <input id="target_chk" class="target_chk" type="checkbox">
-
-                <div class="target_title_area">
-                    <div class="target_title">{% if target %}{{ target.title }}{% else %}今月の目標を指定してください{% endif %}</div>
-
-
-                    <div class="target_title_form">
-                        <form action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}" method="POST">
-                            {% csrf_token %}
-                            <input type="text" name="title" placeholder="今月の目標を指定してください" value="{% if target %}{{ target.title }}{% endif %}">
-
-                            {# ここでname属性がdateになっているため、flatpickrが発動してしまう。type=hiddenにしたのに。flatpickr側を修正する。 #}
-                            {# <input type="hidden" name="date" value="{{ selected_date }}"> #}
-                            <input type="submit" value="送信">
-                        </form>
-                    </div>
-
-                    <div class="target_edit_area">
-                        <form class="target_done" action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}">
-                            {% csrf_token %}
-                            {# TODO:square だと編集アイコンとのズレが気になるのでcircleにした #}
-                            {% if target.done %}
-                            <i class="fa-regular fa-circle-check"></i>
-                            {% else %}
-                            <i class="fa-regular fa-circle"></i>
-                            {% endif %}
-                        </form>
-                        <label for="target_chk" class="target_label"><i class="fa-regular fa-pen-to-square"></i></label>
-                    </div>
-
+                <div id="target_area">
+                    {% include "fitness/parts/target.html" %}
                 </div>
 
                 <h2>トロフィー一覧</h2>
@@ -183,7 +156,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         <div class="food_memory_name">{{ trophy.name }}</div>
                     </div>
                     {% empty %}
-                    <div class="">トロフィー無し</div>
+                    <div class="">トロフィーがありません。</div>
                     {% endfor %}
 
                 </div>
@@ -192,7 +165,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 {# TODO: ここに連続日数を表示させる #}
                 {% if serial >= 2 %}
-                <div>{{ serial }}日連続フィットネス中！！</div>
+                <div class="serial_title">{{ serial }}日連続フィットネス中！！</div>
                 {% endif %}
 
                 <h2>体重・身長</h2>
@@ -200,10 +173,10 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                 <form action="{% url 'fitness:health' %}" method="POST">
                     {% csrf_token %}
                     {# step="0.1"とすることで小数第一位までの入力を許可できる #}
-                    <input type="number" name="weight" value="{{ health.weight }}" placeholder="体重(kg)" step="0.1">
-                    <input type="number" name="height" value="{{ health.height }}" placeholder="身長(cm)" step="0.1">
-                    <input type="text" name="date">
-                    <input type="submit" value="送信">
+                    <input class="form_text" type="number" name="weight" value="{{ health.weight }}" placeholder="体重(kg)" step="0.1">
+                    <input class="form_text" type="number" name="height" value="{{ health.height }}" placeholder="身長(cm)" step="0.1">
+                    <input class="form_text flatpickr_date" type="text" name="date">
+                    <input class="form_button" type="submit" value="送信">
                 </form>
 
                 <table class="table my-2">
@@ -233,11 +206,21 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <h2>設定</h2>
 
-
-                {# TODO:一旦音量のフォームだけ実装。音量変更機能はない。 #}
+                {# TODO:Cookieに記録できる音量設定。DTLでCookieを読み込み、valueにセットできる。 #}
                 <h3>音量設定</h3>
 
-                <input class="form_range" type="range" max="100" min="0">
+                <input class="form_range volume_input" type="range" max="1" min="0" {% if request.COOKIES.volume %}value="{{ request.COOKIES.volume }}"{% else %}value="0.50"{% endif %} step="0.01">
+
+                {% comment %}
+                <div>{{ request.COOKIES }}</div>
+                <div>{{ request.COOKIES.volume }}</div>
+                {% endcomment %}
+
+                <h3>テーマ設定</h3>
+
+                {# ここでテーマカラーを選べるようにする。 #}
+
+
 
             </div>
             <div id="tab_area_2" class="tab_area">
@@ -280,8 +263,10 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                             <div class="food_memory_name">{{ food_memory.category.name }}</div>
                             {% if food_memory.img %}
                             <div class="food_memory_image"><img src="{{ food_memory.img.url }}" alt="食事画像"></div>
+                            {% else %}
+                            {# TODO:食事の画像がない場合のnoimage画像をstaticディレクトリに用意する。 #}
+                            <div class="food_memory_image"><img src="{% static 'fitness/image/noimage.png' %}" alt="noimage"></div>
                             {% endif %}
-                            <div class="food_memory_description">{{ food_memory.description }}</div>
                             <div class="food_memory_kcal">{{ food_memory.kcal }} kcal</div>
                             <div class="food_memory_exe_dt">{{ food_memory.exe_dt|date:"H時i分" }}</div>
                         </div>
@@ -290,8 +275,6 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         {% endfor %}
 
                     </div>
-
-
 
                 </div>
                 {% endif %}
@@ -378,6 +361,10 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <form action="{% url 'fitness:food_category' %}" method="POST">
                     {% csrf_token %}
+                    {% comment %}
+                    <input class="form_text" type="text" name="name" placeholder="カテゴリ名">
+                    <input class="form_button" type="submit" value="送信">
+                    {% endcomment %}
 
                     <div class="input-group">
                         <input class="form-control" type="text" name="name" placeholder="カテゴリ名">
@@ -401,7 +388,24 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <form action="{% url 'fitness:food_memory' %}" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <input type="text" name="exe_dt">
+
+                    {% comment %}
+                    <input class="form_text flatpickr_dt" type="text" name="exe_dt">
+                    <input class="form_text" type="number" name="kcal" placeholder="カロリー">
+                    <label>画像:<input type="file" name="img"></label>
+                    <select class="form_select" name="category">
+                        <option value="">カテゴリを選んでください</option>
+                        {% for food_category in food_categories %}
+                        <option value="{{ food_category.id }}">{{ food_category.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div class="text-right">
+                        <input class="form_button" type="submit" value="送信">
+                    </div>
+                    {% endcomment %}
+
+                    <input class="flatpickr_dt" type="text" name="exe_dt">
                     <input type="number" name="kcal" placeholder="カロリー">
                     <label>画像:<input type="file" name="img"></label>
                     <select class="form-control" name="category">
@@ -410,8 +414,6 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         <option value="{{ food_category.id }}">{{ food_category.name }}</option>
                         {% endfor %}
                     </select>
-
-                    <textarea class="form-control" name="description" placeholder="自由記入欄"></textarea>
 
                     <input type="submit" value="送信">
                 </form>
@@ -451,7 +453,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                     <div class="form-row">
 
                         <div class="col-sm-6">
-                            <input class="form-control" type="text" name="exe_dt">
+                            <input class="form-control flatpickr_dt" type="text" name="exe_dt">
                         </div>
                         <div class="col-sm-6">
                             <select class="form-control" name="category">
@@ -566,24 +568,15 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 <input id="modal_chk" class="modal_chk" type="checkbox">
 <div class="modal_content_area">
 
-
-    {# TODO:保存しないで終了を実装させる #}
-
     <label class="modal_label" for="modal_chk"><i class="fa-regular fa-circle-xmark"></i></label>
     <label class="modal_label modal_label_save" for="modal_chk"><i class="fa-solid fa-floppy-disk"></i></label>
-    
-
 
     <div class="modal_content">
     
-        {# TODO:ここでタイマーとストップウォッチを兼ねる #}
+        {# ここでタイマーとストップウォッチを兼ねる #}
         <div id="doing_category"></div>
         <div id="remain">00時間00分00秒</div>
         <div>
-            {# TODO:ここの一時停止もfontawesomeの再生と停止を表示非表示を繰り返して表現してみる #}
-            {% comment %}
-            <input id="timer_pause" type="button" value="一時停止">
-            {% endcomment %}
             <div id="timer_pause" class="timer_pause">
                 <i class="fa-solid fa-play" style="display:none;"></i>
                 <i class="fa-solid fa-pause"></i>
@@ -594,6 +587,10 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
     </div>
 
+</div>
+
+<div id="message_area" class="message_area">
+    {% include "fitness/parts/message.html" %}
 </div>
 
 

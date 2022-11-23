@@ -1,0 +1,8 @@
+{# TODO:ここでcheckboxとCSSを使った非表示は通用しない(次の表示されるメッセージもcheck状態が保持されるため) #}
+{% for message in messages %}
+<div class="message_body {{ message.tags }}">
+    <div class="message_content">{{ message }}</div>
+    <div class="message_delete"><i class="fa-regular fa-circle-xmark"></i></div>
+</div>
+{% endfor %}
+

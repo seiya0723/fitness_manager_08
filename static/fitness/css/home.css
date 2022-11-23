@@ -388,10 +388,13 @@ input[type="radio"]#tab_radio_5:checked ~ #tab_area_5 { display:block; }
     transform:translate(-50%, -50%);
     */
 }
-.food_memory_description{
-    font-size:0.85rem;
-}
 
+
+/* serial */
+.serial_title{
+    font-size:2rem;
+    font-weight:bold;
+}
 
 /* 今月の目標 */
 .target_chk { display:none; }
@@ -438,15 +441,122 @@ input[type="radio"]#tab_radio_5:checked ~ #tab_area_5 { display:block; }
 
 
 /* form */
-
-
 .form_range{
-
     appearance: none;
     cursor: pointer;
     outline: none;
     height: 0.75rem;
     width: 100%;
     background: linear-gradient(90deg, rgba(255,236,221,1) 0%, rgba(253,126,20,1) 100%);
+}
+/* inheritは親要素の装飾を受け継ぐ。つまり、親要素の背景文字色に合わせて変化する */
+.form_button{
+    display:inline-block;
+    background:inherit;
+    color:inherit;
 
+    padding:0.2rem 1.5rem;
+    font-size:1.2rem;
+
+    border:solid 0.2rem orange;
+    border-radius:0.5rem;
+
+    transition:0.2s;
+}
+.form_button:hover{
+    background:orange;
+    color:white;
+    transition:0.2s;
+}
+.form_button:active{
+    background:inherit;
+    color:inherit;
+}
+
+.form_text {
+    display:inline-block;
+    background:inherit;
+    color:inherit;
+
+    max-width:100%;
+    font-size:1.2rem;
+
+    border:solid 0.2rem orange;
+    border-radius:0.5rem;
+
+    transition:0.2s;
+}
+.form_text:focus{
+    /* ブラウザのアウトラインを無効化させる */
+    outline:none;
+
+    /* filter:drop-shadow を使うことで文字に対しても影をつけることができる。
+    filter: drop-shadow(0px 0px 1px orange);
+    */
+    box-shadow:0px 0px 5px orange;
+
+    transition:0.2s;
+}
+.form_select{
+    display:inline-block;
+    background:inherit;
+    color:inherit;
+
+    font-size:1.2rem;
+    padding:0.25rem 0.5rem;
+
+    border:solid 0.2rem orange;
+    border-radius:0.5rem;
+}
+
+
+
+
+
+
+/* message */
+
+
+.message_area{
+    position:fixed;
+    top:0;
+    left:50%;
+
+    transform:translate(-50%,0);
+}
+.message_body {
+    border-radius:0.5rem;
+
+    font-size:1.25rem;
+    display:flex;
+
+    margin:0.25rem;
+    padding:0.5rem 2rem;
+    border:solid 0.2rem black;
+    border-radius:0.5rem;
+
+    color:white;
+}
+.message_content{
+    width:calc(100% - 3rem);
+}
+.message_delete{
+    width:3rem;
+    text-align:center;
+    cursor:pointer;
+}
+.success{
+    background:forestgreen;
+}
+.info{
+    background:deepskyblue;
+}
+.error{
+    background:crimson;
+}
+/* message スマホ用表示 */
+@media (max-width:800px){
+    .message_area {
+        width:90%;
+    }
 }

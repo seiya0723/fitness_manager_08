@@ -1,0 +1,30 @@
+<input id="target_chk" class="target_chk" type="checkbox">
+<div class="target_title_area">
+    <div class="target_title">{% if target %}{{ target.title }}{% else %}今月の目標を指定してください{% endif %}</div>
+
+
+    <div class="target_title_form">
+        <form action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="今月の目標を指定してください" value="{% if target %}{{ target.title }}{% endif %}">
+
+            {# ここでname属性がdateになっているため、flatpickrが発動してしまう。type=hiddenにしたのに。flatpickr側を修正する。 #}
+            <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+            <input class="target_submit" type="button" value="送信">
+        </form>
+    </div>
+
+    <div class="target_edit_area">
+        <form class="target_done" action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}">
+            {% csrf_token %}
+            {# TODO:square だと編集アイコンとのズレが気になるのでcircleにした #}
+            {% if target.done %}
+            <i class="fa-regular fa-circle-check"></i>
+            {% else %}
+            <i class="fa-regular fa-circle"></i>
+            {% endif %}
+        </form>
+        <label for="target_chk" class="target_label"><i class="fa-regular fa-pen-to-square"></i></label>
+    </div>
+</div>
+

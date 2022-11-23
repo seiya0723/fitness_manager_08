@@ -53,11 +53,6 @@ class FitnessMemory(models.Model):
     def time_format(self):
         return duration_format( int(self.time.total_seconds()) )
 
-    #TODO:分単位での表示メソッド(ただし、これは合算しているグラフには使えない)
-    def format_minutes(self):
-        #60秒で割って切り捨てる
-        return self.time.total_seconds() // 60
-
     def __str__(self):
         return str(self.id)
 
@@ -77,6 +72,8 @@ class FoodCategory(models.Model):
 class FoodMemory(models.Model):
     id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     dt          = models.DateTimeField(verbose_name='登録日時', default=timezone.now)
+
+
     img         = models.ImageField(verbose_name='食事画像', upload_to='fitness/food/',null=True,blank=True)
 
     #TODO:MaxValueValidatorをセットする( 成人男性の1日のカロリーは多くとも3000kcalなので、体重増加が目的だったとしても、1食10000kcalを上限で良いのでは？←力士は一日で8000kcal摂取する)
@@ -189,17 +186,20 @@ class Health(models.Model):
     weight      = models.IntegerField(verbose_name="体重(kg)")
     height      = models.IntegerField(verbose_name="身長(cm)")
     """
+    # 123.4 -123.4
     weight      = models.DecimalField(verbose_name="体重(kg)",max_digits=4,decimal_places=1)
     height      = models.DecimalField(verbose_name="身長(cm)",max_digits=4,decimal_places=1)
 
+    #weight      = models.DecimalField(verbose_name="体重(kg)",max_digits=4,decimal_places=1,validators=[MinValueValidator(0))
+    #height      = models.DecimalField(verbose_name="身長(cm)",max_digits=4,decimal_places=1,validators=[MinValueValidator(0))
 
 
 #今月の目標を記録するモデルを作る
 class Target(models.Model):
 
     #TODO:ここはunique_togetherで？同じ月に複数登録できないようにするべきでは？←別途バリデーションを用意するという方法もあるかと？
-
     class Meta:
+        #uniqueはDB上に2つ存在してはいけないという制約であって、既存のレコードの編集はOK
         unique_together = ("date","user")
 
     id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

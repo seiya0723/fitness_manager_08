@@ -1,36 +1,25 @@
 【修正・対応済み】
 
+## 2022年11月23日
 
-## 2022年11月20日
+- 音量の調整欄(Cookieに保存する)
+- favicon.icoを用意して当てる(フリー素材)(https://www.freefavicon.com/freefavicons/icons/iconinfo/running-pictogram-152-77317.html)
+- noimage画像を用意する(食事の画像に当てるフリー素材)  (http://design-ec.com/?p=55)
+- DjangoMessageFrameworkを使って投稿した時に『投稿しました』と表示させる
+- 他の投稿や削除もAjaxとレンダリングを行えるように仕立てる(includeするテンプレートファイルはディレクトリに格納する)(←とりあえず目標部分はAjaxとレンダリングまで対応)
 
-- chart.jsのグラフを分単位で描画する
-- 手動記録追加のDurationFieldの入力、例のJavaScriptライブラリ ( https://nadchif.github.io/html-duration-picker.js/ ) を使っても良いのでは？←プロジェクトの添付画像のようにする？
-
-【モデル関係】
-- 不要なフィールドの撤廃？(FoodMemoryのdescription、)
-- 一部フィールドの文字数制限(FoodCategoryのname、FitnessCategoryのname)
-- 体重と日付のデータを表示する(概要タブ)。グラフも作る
-
-- 音量が出ないエラー(2022年11月18日確認 正常に音が鳴る)
-- Bootstrapではないform系のタグの装飾の用意
 
 
 【提案】
 
-- 音量の調整欄(Cookieに保存する)
-
-- DjangoMessageFrameworkを使って投稿した時に『投稿しました』と表示させる
-- 他の投稿や削除もAjaxとレンダリングを行えるように仕立てる(includeするテンプレートファイルはディレクトリに格納する)
+- DurationFieldのフォームはselectタグを3つ用意してAjax送信する前に連結して送信
+- 円グラフが大きい順になっていないバグの修正
 
 - テーマカラー(スキン)を用意して、黒背景に明るめの色で統一してbox-shadowなどの装飾で陰をつける、選べるようにする(CookieとDTLを使って選んだCSSをレンダリング)
-- 円グラフが大きい順になっていないバグの修正
 
 ===========
 
-
 - 要件定義書を作る
-
-
 
 
 
@@ -59,6 +48,22 @@
 - 目標入力欄にて、ここはcheckboxを使ってフォームと目標の表示を切り替える形式にする
 - トロフィー一覧の表示もフィットネスやフードと同じように横並び
 - 体重と身長の記録
+
+
+## 2022年11月20日
+
+- chart.jsのグラフを分単位で描画する← // 60 で対処
+- 手動記録追加のDurationFieldの入力、例のJavaScriptライブラリ ( https://nadchif.github.io/html-duration-picker.js/ ) を使っても良いのでは？←プロジェクトの添付画像のようにする？
+
+【モデル関係】
+- 不要なフィールドの撤廃？(FoodMemoryのdescription、)
+- 一部フィールドの文字数制限(FoodCategoryのname、FitnessCategoryのname)
+- 体重と日付のデータを表示する(概要タブ)。グラフも作る
+
+- 音量が出ないエラー(2022年11月18日確認 正常に音が鳴る)
+- Bootstrapではないform系のタグの装飾の用意
+- 音量の調節用のフォーム
+- DjangoMessageFrameworkをビューに実装、テンプレートは未実装
 
 
 

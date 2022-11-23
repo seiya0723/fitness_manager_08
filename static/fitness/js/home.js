@@ -58,7 +58,8 @@ window.addEventListener("load" , function (){
         defaultDate: date,
     }
     //TODO:クラス名で指定する flatpickr_dt
-    flatpickr("[name='exe_dt']",config_dt);
+    //flatpickr("[name='exe_dt']",config_dt);
+    flatpickr(".flatpickr_dt",config_dt);
 
     let config_date = { 
         locale: "ja",
@@ -66,7 +67,8 @@ window.addEventListener("load" , function (){
         defaultDate: date,
     }
     //TODO:クラス名で指定する flatpickr_date
-    flatpickr("[name='date']",config_date);
+    //flatpickr("[name='date']",config_date);
+    flatpickr(".flatpickr_date",config_date);
 
     $(document).on("click", "#fitness_memory_submit", function() { fitness_memory_submit(this) });
 
@@ -87,6 +89,24 @@ window.addEventListener("load" , function (){
 
 
     $(document).on("click", ".target_done", function(){ target_done(this); });
+    $(document).on("click", ".target_submit", function(){ target_submit(this); });
+
+
+    //音量の調整
+    $(document).on("change",".volume_input", function(){ volume_input(this)  });
+
+
+    //TODO:DjangoMessageFrameworkは5秒経ったら自動的に消える
+    setTimeout(function(){
+        $(".message_body").css({"display":"none"});
+    }, 5000);
+
+    //TODO:idが被るので、いつものcheckboxは通用しない
+    //DjangoMessageFrameworkの削除
+    $(document).on("click", ".message_delete", function(){ 
+        $(this).parents(".message_body").css({"display":"none"});
+    });
+
 
 });
 
@@ -204,6 +224,7 @@ function fitness_memory_submit(elem){
 
         if (!data.error){
             console.log("投稿完了")
+            window.location.replace("");
         }
         else{
             console.log("ERROR");
@@ -261,7 +282,10 @@ function fitness_memory_list_submit(details){
     }).done( function(data, status, xhr ) { 
 
         if (!data.error){
-            console.log("投稿完了")
+            console.log("投稿完了");
+
+            //TODO:selected_dateをどうやって表現するか？それができないのであればJS側から更新したほうが良い
+            window.location.replace("");
         }
         else{
             console.log("ERROR");
@@ -271,6 +295,37 @@ function fitness_memory_list_submit(details){
         console.log(status + ":" + error );
     }); 
 
+}
+
+
+function target_submit(elem){
+
+    let form_elem   = $(elem).parents("form");
+
+
+    let data    = new FormData( $(form_elem).get(0) );
+    let url     = $(form_elem).prop("action");
+    let method  = $(form_elem).prop("method");
+
+    $.ajax({
+        url: url,
+        type: method,
+        data: data,
+        processData: false,
+        contentType: false,
+        dataType: 'json'
+    }).done( function(data, status, xhr ) { 
+
+        if (!data.error){
+            $("#target_area").html(data.content);
+        }
+        else{
+            console.log("ERROR");
+        }
+
+    }).fail( function(xhr, status, error) {
+        console.log(status + ":" + error );
+    }); 
 }
 
 //目標を完了にさせる
@@ -291,6 +346,9 @@ function target_done(form_elem){
 
         if (!data.error){
             console.log("投稿完了")
+            
+            $("#target_area").html(data.content);
+
         }
         else{
             console.log("ERROR");
@@ -299,6 +357,12 @@ function target_done(form_elem){
     }).fail( function(xhr, status, error) {
         console.log(status + ":" + error );
     }); 
+}
 
 
+//TODO:音量のセット
+function volume_input(elem){
+    //Cookieをセットする。 SameSiteをセットしておく。
+    document.cookie = "volume=" + String($(elem).val()) + ";SameSite=strict";
+    console.log(document.cookie)
 }
