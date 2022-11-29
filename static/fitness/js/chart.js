@@ -2,10 +2,7 @@ window.addEventListener("load" , function (){
 
     draw_daily_graph();
     draw_month_category_graph();
-    
-
     draw_year_total_graph();
-
 
 });
 function draw_daily_graph(){
@@ -52,9 +49,29 @@ function draw_daily_graph(){
 //今月のカテゴリごとのグラフ(円グラフ)
 function draw_month_category_graph(){
 
-    let category_elems  = $(".month_category")
-    let time_elems      = $(".month_time")
+    let category_elems  = $(".month_category");
+    let time_elems      = $(".month_time");
 
+    //TODO:オブジェクトの配列を作る
+    let data_label      = [];
+    for (let i=0;i<category_elems.length;i++){
+        data_label.push( { category : category_elems.eq(i).text(), time : Number(time_elems.eq(i).text()) } );
+    }
+
+    //並び替える
+    data_label.sort( (a, b) => { return a.time - b.time; });
+
+    console.log(data_label);
+
+    //分離させる
+    let categories  = [];
+    let times       = [];
+    for (let data of data_label){
+        categories.push(data.category);
+        times.push(data.time);
+    }
+
+    /*
     let categories  = [];
     let times       = [];
 
@@ -65,6 +82,7 @@ function draw_month_category_graph(){
     for (let time_elem of time_elems){
         times.push(time_elem.innerText);
     }
+    */
 
 
     const ctx = document.getElementById("month_category_graph").getContext('2d');

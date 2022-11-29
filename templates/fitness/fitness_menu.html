@@ -22,7 +22,6 @@
             <input class="menu_start" type="button" value="このメニューを始める">
         </form>
 
-
         {% for detail in menu.details %}
         <div class="row">
             <div class="col">{{ detail.category }} : {{ detail.time_format }}</div>
@@ -33,9 +32,6 @@
             </div>
         </div>
         {% endfor %}
-
-
-
 
     </div>
 
@@ -48,28 +44,33 @@
             <input type="text" name="name" value="{{ menu.name }}">
             <input class="menu_detail_create_row_add" type="button" value="追加">
 
-
             <div class="menu_detail_create_form">
 
                 {% for detail in menu.details %}
                 <div class="menu_detail_create_row">
                     <i class="fas fa-bars handle"></i>
                     <select name="category">
-                        <option value="">フィットネスカテゴリを選んでください</option>
+                        <option value="">カテゴリを選んでください</option>
                         {% for category in categories %}
                         <option value="{{ category.id }}" {% if detail.category.id == category.id %}selected{% endif %}>{{ category.name }}</option>
                         {% endfor %}
                     </select>
+
+
+                    {# TODO:ここをselectタグ仕様に書き換える #}
                     <input type="text" name="time" placeholder="00:00:00" value="{{ detail.time_input_format }}">
+
+
                     <input type="hidden" name="id" value="{{ detail.id }}">
                 </div>
                 {% endfor %}
 
                 {# ここに追加される #}
-
             </div>
 
-            <input class="menu_edit_submit" type="button" value="送信">
+            <div class="text-right">
+                <input class="menu_edit_submit" type="button" value="送信">
+            </div>
         </form>
 
     </div>

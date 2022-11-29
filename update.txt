@@ -1,19 +1,14 @@
 【修正・対応済み】
 
-## 2022年11月23日
 
-- 音量の調整欄(Cookieに保存する)
-- favicon.icoを用意して当てる(フリー素材)(https://www.freefavicon.com/freefavicons/icons/iconinfo/running-pictogram-152-77317.html)
-- noimage画像を用意する(食事の画像に当てるフリー素材)  (http://design-ec.com/?p=55)
-- DjangoMessageFrameworkを使って投稿した時に『投稿しました』と表示させる
-- 他の投稿や削除もAjaxとレンダリングを行えるように仕立てる(includeするテンプレートファイルはディレクトリに格納する)(←とりあえず目標部分はAjaxとレンダリングまで対応)
+## 2022年11月30日
 
+- DurationFieldのフォームはselectタグを3つ用意してAjax送信する前に連結して送信(このselectタグは流用できるので、parts/time_form.htmlで作成)
+- inputタグテキストボックスにて、Enterを入力した時に送信される問題の対処。
+- 円グラフが大きい順になっていないバグの修正(ブログも参照、sortを使った。)
 
 
 【提案】
-
-- DurationFieldのフォームはselectタグを3つ用意してAjax送信する前に連結して送信
-- 円グラフが大きい順になっていないバグの修正
 
 - テーマカラー(スキン)を用意して、黒背景に明るめの色で統一してbox-shadowなどの装飾で陰をつける、選べるようにする(CookieとDTLを使って選んだCSSをレンダリング)
 
@@ -65,5 +60,13 @@
 - 音量の調節用のフォーム
 - DjangoMessageFrameworkをビューに実装、テンプレートは未実装
 
+
+## 2022年11月23日
+
+- 音量の調整欄(Cookieに保存する)
+- favicon.icoを用意して当てる(フリー素材)(https://www.freefavicon.com/freefavicons/icons/iconinfo/running-pictogram-152-77317.html)
+- noimage画像を用意する(食事の画像に当てるフリー素材)  (http://design-ec.com/?p=55)
+- DjangoMessageFrameworkを使って投稿した時に『投稿しました』と表示させる
+- 他の投稿や削除もAjaxとレンダリングを行えるように仕立てる(includeするテンプレートファイルはディレクトリに格納する)(←とりあえず目標部分はAjaxとレンダリングまで対応)
 
 

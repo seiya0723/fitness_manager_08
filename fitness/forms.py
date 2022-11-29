@@ -27,11 +27,6 @@ class FoodMemoryForm(forms.ModelForm):
         fields  = ["img","kcal","exe_dt","category","user",]
 
 
-
-
-
-
-
 class FitnessCategoryForm(forms.ModelForm):
     class Meta:
         model   = FitnessCategory

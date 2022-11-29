@@ -87,26 +87,31 @@ window.addEventListener("load" , function (){
     });
 
 
-
     $(document).on("click", ".target_done", function(){ target_done(this); });
     $(document).on("click", ".target_submit", function(){ target_submit(this); });
-
 
     //音量の調整
     $(document).on("change",".volume_input", function(){ volume_input(this)  });
 
 
-    //TODO:DjangoMessageFrameworkは5秒経ったら自動的に消える
+    //DjangoMessageFrameworkは5秒経ったら自動的に消える
     setTimeout(function(){
         $(".message_body").css({"display":"none"});
     }, 5000);
 
-    //TODO:idが被るので、いつものcheckboxは通用しない
+    //idが被るので、いつものcheckboxは通用しない
     //DjangoMessageFrameworkの削除
     $(document).on("click", ".message_delete", function(){ 
         $(this).parents(".message_body").css({"display":"none"});
     });
 
+
+    //TODO:inputタグでEnterキーが押されたら無効化する。
+    $("input").on("keydown", function(e) {
+        if ((e.keyCode && e.keyCode === 13)) {
+            return false;
+        }
+    });
 
 });
 
@@ -118,7 +123,29 @@ function menu_create(elem){
     let url         = $(form_elem).prop("action");
     let method      = $(form_elem).prop("method");
 
-    console.log("create")
+
+    //===========================
+
+    //複数ある hours minutes seconds を組み合わせる。
+    let hours_list      = data.getAll("hours");
+    let minutes_list    = data.getAll("minutes");
+    let seconds_list    = data.getAll("seconds");
+
+    let length          = hours_list.length;
+
+    let time_list       = [];
+    for (let i=0;i<length;i++){
+        time_list.push( Number(hours_list[i])*3600 + Number(minutes_list[i])*60 + Number(seconds_list[i]) );
+    }
+
+    //timeをリストにするには、.set()で上書きするのではなく、.appendで追加する。
+    for (let time of time_list){
+        data.append("time", time);
+    }
+
+    //===========================
+
+
 
     $.ajax({
         url: url,
@@ -212,6 +239,9 @@ function fitness_memory_submit(elem){
     let data        = new FormData( $(form_elem).get(0) );
     let url         = $(form_elem).prop("action");
     let method      = $(form_elem).prop("method");
+
+    //TODO:ここでhours minutes secondsを修正する。
+    data.set("time" , Number(data.get("hours"))*3600 + Number(data.get("minutes"))*60 + Number(data.get("seconds")) );
 
     $.ajax({
         url: url,

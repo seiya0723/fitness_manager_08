@@ -1,0 +1,131 @@
+body {
+    background:black;
+    color:white;
+
+    border-color:orange;
+}
+h2 { background:orange; }
+h3 { border-color:orange; }
+
+/* bootstrap のaタグのhoverを無効化 */
+a:hover{ color:inherit;text-decoration:none; }
+i{
+    color:white;
+}
+
+/* TIPS:borderは色を省略すると、親要素のcolorを継承する。 */
+.calendar {
+    border:solid 0.2rem white;
+}
+.calendar td{
+    border:solid 0.1rem white;
+}
+.calendar td:nth-child(1) {
+    color:magenta;
+}
+.calendar td:nth-child(7) {
+    color:cyan;
+}
+.calendar_head {
+    border-bottom:double 0.2rem white;
+}
+.calendar_day_today{
+    background:orange;
+    color:black;
+}
+.calendar_day_today i{
+    color:black;
+}
+
+
+.tab_area {
+    border:solid 0.2rem white;
+}
+.tab_label {
+    border-top:solid 0.2rem white;
+    border-left:solid 0.2rem white;
+    border-right:solid 0.2rem white;
+}
+
+input[type="radio"]#tab_radio_1:checked ~ .tab_label_area > label[for="tab_radio_1"].tab_label { background:orange;color:black; }
+input[type="radio"]#tab_radio_2:checked ~ .tab_label_area > label[for="tab_radio_2"].tab_label { background:orange;color:black; }
+input[type="radio"]#tab_radio_3:checked ~ .tab_label_area > label[for="tab_radio_3"].tab_label { background:orange;color:black; }
+input[type="radio"]#tab_radio_4:checked ~ .tab_label_area > label[for="tab_radio_4"].tab_label { background:orange;color:black; }
+input[type="radio"]#tab_radio_5:checked ~ .tab_label_area > label[for="tab_radio_5"].tab_label { background:orange;color:black; }
+
+/* モーダル領域 */
+.modal_content_area{
+    background:inherit;
+}
+.modal_label:hover{
+    color:orange;
+}
+
+/* 右側のHTML */
+.container_area{
+    border:solid 0.2rem white;
+}
+
+/* Menu Detail Edit */
+.menu_edit {
+    border:solid 0.1rem orange;
+}
+.menu_content {
+    border:solid 0.1rem orange;
+}
+
+
+/* menu_detail_area */
+.menu_detail_dragging{
+    background:orange;
+}
+
+
+/* sp bottom menu */
+@media (max-width:800px){
+    .sp_menu_area {
+        background:inherit;
+        border-top:solid 0.2rem orange;
+    }
+    .sp_menu_content {
+        color:orange;
+        border-left:solid 0.1rem orange;
+        border-right:solid 0.1rem orange;
+    }
+    .sp_menu_content i {
+        color:orange;
+    }
+    /* スマホのhoverはあまり効果ない */
+    .sp_menu_content:hover {
+        background:orange;
+        color:white;
+    }
+    .sp_menu_content:hover i{
+        color:white;
+    }
+}
+
+
+/* 日ごとの横並べ */
+.fitness_memory_content {
+    background:orange;
+}
+.food_memory_content{
+    background:orange;
+}
+
+/* form */
+.form_range{
+    background: linear-gradient(90deg, white 0%, orange 100%);
+}
+
+/* message */
+.success{
+    background:forestgreen;
+}
+.info{
+    background:deepskyblue;
+}
+.error{
+    background:crimson;
+}

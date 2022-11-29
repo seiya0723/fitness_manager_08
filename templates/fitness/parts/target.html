@@ -2,7 +2,6 @@
 <div class="target_title_area">
     <div class="target_title">{% if target %}{{ target.title }}{% else %}今月の目標を指定してください{% endif %}</div>
 
-
     <div class="target_title_form">
         <form action="{% if target %}{% url 'fitness:target_single' target.id %}{% else %}{% url 'fitness:target' %}{% endif %}" method="POST">
             {% csrf_token %}

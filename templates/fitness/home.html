@@ -31,9 +31,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
     {# duration-picker  クラス名にhtml-duration-pickerを追加するだけ #}
-    <script src="https://cdn.jsdelivr.net/npm/html-duration-picker@latest/dist/html-duration-picker.min.js"></script>
+    {# <script src="https://cdn.jsdelivr.net/npm/html-duration-picker@latest/dist/html-duration-picker.min.js"></script> #}
 
     <link rel="stylesheet" href="{% static 'fitness/css/home.css' %}">
+
+
+    <link rel="stylesheet" href="{% static 'fitness/css/theme_origin.css' %}">
+
+    {# シアン #}
+    {# <link rel="stylesheet" href="{% static 'fitness/css/theme_cyan.css' %}"> #}
+
+    {# ターミナルカラー #}
+    {# <link rel="stylesheet" href="{% static 'fitness/css/theme_terminal.css' %}"> #}
+
+
+
 
     <script src="{% static 'common/js/ajax.js' %}"></script>
     <script src="{% static 'fitness/js/home.js' %}"></script>
@@ -93,10 +105,8 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         {% for date in week_date %}
                         {# 今日の日付に背景色を加える #}
                         {# TODO:tdをクリックした時、日ごとのタブに切り替え、スクロールするJSを発動。←cursor:pointerを入れても良いのでは？ #}
-                        <td class="
-                            {% if date.food_memories or date.memories %}
-                            calendar_day_exist
-                            {% endif %}" {% if today == date.day %}style="background:orange;"{% endif %}>
+                        <td class="{% if date.food_memories or date.memories %}calendar_day_exist{% endif %} 
+                            {% if today == date.day %}calendar_day_today{% endif %}" >
                             <div class="calendar_day">{{ date.day.day }}</div>
 
                             {# ここにフィットネスをしていればアイコンを表示 #}
@@ -163,7 +173,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <h2>連続日数</h2>
 
-                {# TODO: ここに連続日数を表示させる #}
+                {# ここに連続日数を表示させる #}
                 {% if serial >= 2 %}
                 <div class="serial_title">{{ serial }}日連続フィットネス中！！</div>
                 {% endif %}
@@ -173,10 +183,10 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                 <form action="{% url 'fitness:health' %}" method="POST">
                     {% csrf_token %}
                     {# step="0.1"とすることで小数第一位までの入力を許可できる #}
-                    <input class="form_text" type="number" name="weight" value="{{ health.weight }}" placeholder="体重(kg)" step="0.1">
-                    <input class="form_text" type="number" name="height" value="{{ health.height }}" placeholder="身長(cm)" step="0.1">
-                    <input class="form_text flatpickr_date" type="text" name="date">
-                    <input class="form_button" type="submit" value="送信">
+                    <input type="number" name="weight" value="{{ health.weight }}" placeholder="体重(kg)" step="0.1">
+                    <input type="number" name="height" value="{{ health.height }}" placeholder="身長(cm)" step="0.1">
+                    <input class="flatpickr_date" type="text" name="date">
+                    <input type="submit" value="送信">
                 </form>
 
                 <table class="table my-2">
@@ -405,15 +415,15 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                     </div>
                     {% endcomment %}
 
-                    <input class="flatpickr_dt" type="text" name="exe_dt">
-                    <input type="number" name="kcal" placeholder="カロリー">
-                    <label>画像:<input type="file" name="img"></label>
-                    <select class="form-control" name="category">
+                    <select name="category">
                         <option value="">カテゴリを選んでください</option>
                         {% for food_category in food_categories %}
                         <option value="{{ food_category.id }}">{{ food_category.name }}</option>
                         {% endfor %}
                     </select>
+                    <input class="flatpickr_dt" type="text" name="exe_dt">
+                    <input type="number" name="kcal" placeholder="摂取 kcal">
+                    <label class="input_file_label">画像<input type="file" name="img"></label>
 
                     <input type="submit" value="送信">
                 </form>
@@ -425,14 +435,8 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <form action="{% url 'fitness:fitness_category' %}" method="POST">
                     {% csrf_token %}
-                    <div class="form-row">
-                        <div class="col-sm-6">
-                            <input class="form-control" type="text" name="name" placeholder="カテゴリ名">
-                        </div>
-                        <div class="col-sm-6">
-                            <input class="form-control" type="number" name="kcal" placeholder="1分あたりの消費カロリー">
-                        </div>
-                    </div>
+                    <input type="text" name="name" placeholder="カテゴリ名">
+                    <input type="number" name="kcal" placeholder="1分当たりの消費kcal">
                     <input class="" type="submit" value="送信">
                 </form>
 
@@ -450,23 +454,19 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <form action="{% url 'fitness:fitness_memory' %}" method="POST">
                     {% csrf_token %}
-                    <div class="form-row">
 
-                        <div class="col-sm-6">
-                            <input class="form-control flatpickr_dt" type="text" name="exe_dt">
-                        </div>
-                        <div class="col-sm-6">
-                            <select class="form-control" name="category">
-                                <option value="">カテゴリを選んでください</option>
-                                {% for category in categories %}
-                                <option value="{{ category.id }}">{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-sm-6">
-                            <input class="form-control html-duration-picker" type="text" name="time" placeholder="00:00:00">
-                        </div>
-                    </div>
+                    <select class="" name="category">
+                        <option value="">カテゴリを選んでください</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input class="flatpickr_dt" type="text" name="exe_dt">
+                    {# <input class="form-control html-duration-picker" type="text" name="time" placeholder="00:00:00"> #} 
+
+                    {# ここでselectタグの時間指定フォームを読み込む #}
+                    {% include "fitness/parts/time_form.html" %}
+
                     <input id="fitness_memory_submit" type="button" value="送信">
                 </form>
             </div>
@@ -476,9 +476,8 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                 <h2>ストップウォッチ</h2>
 
                 <form class="input-group">
-
-                    <select class="form-control" name="category">
-                        <option value="">フィットネスカテゴリを選んでください</option>
+                    <select class="" name="category">
+                        <option value="">カテゴリを選んでください</option>
                         {% for category in categories %}
                         <option value="{{ category.id }}">{{ category.name }}</option>
                         {% endfor %}
@@ -487,6 +486,7 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         <input id="watch_start" class="form-control" type="button" value="スタート">
                     </div>
                 </form>
+
             </div>
 
             <div id="menu" class="container_area">
@@ -497,12 +497,16 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                     <div class="menu_detail_create_row">
                         <i class="fas fa-bars handle"></i>
                         <select name="category">
-                            <option value="">フィットネスカテゴリを選んでください</option>
+                            <option value="">カテゴリを選んでください</option>
                             {% for category in categories %}
                             <option value="{{ category.id }}">{{ category.name }}</option>
                             {% endfor %}
                         </select>
-                        <input type="text" name="time" placeholder="00:00:00">
+                        {# <input type="text" name="time" placeholder="00:00:00"> #}
+
+                        {# ここでselectタグの時間指定フォームを読み込む #}
+                        {% include "fitness/parts/time_form.html" %}
+
                         <input class="menu_detail_create_delete" type="button" value="削除">
                         <input type="hidden" name="id" value="">
                     </div>
@@ -518,7 +522,9 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                         {# ここにDetailフォームが追加される。 #}
                     </div>
 
-                    <input id="menu_create_submit" type="button" value="送信">
+                    <div class="text-right">
+                        <input id="menu_create_submit" type="button" value="送信">
+                    </div>
                 </form>
             </div>
 
