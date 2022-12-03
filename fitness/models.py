@@ -126,6 +126,19 @@ class MenuDetail(models.Model):
     def time_input_format(self):
         return duration_format( int(self.time.total_seconds()), input_format=True )
 
+
+    #MenuDetail編集時のselectタグの作成
+    def time_hours(self):
+        return self.time.seconds // 3600
+        
+    def time_minutes(self):
+        return self.time.seconds % 3600 // 60
+
+    def time_seconds(self):
+        return self.time.seconds % 3600 % 60
+
+
+
     def __str__(self):
         return str(self.id)
 

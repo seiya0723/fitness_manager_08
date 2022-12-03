@@ -1,19 +1,19 @@
 {% with hours=""|center:10 range=""|center:60 %}
 <select name="hours">
     {% for x in hours %}
-    <option value="{{ forloop.counter0 }}">{% if forloop.counter0 < 10 %}0{% endif %}{{ forloop.counter0 }}</option>
+    <option value="{{ forloop.counter0 }}" {% if hours == forloop.counter0 %}selected{% endif %}>{% if forloop.counter0 < 10 %}0{% endif %}{{ forloop.counter0 }}</option>
     {% endfor %}
 </select>
 :   
 <select name="minutes">
     {% for x in range %}
-    <option value="{{ forloop.counter0 }}">{% if forloop.counter0 < 10 %}0{% endif %}{{ forloop.counter0 }}</option>
+    <option value="{{ forloop.counter0 }}" {% if minutes == forloop.counter0 %}selected{% endif %}>{% if forloop.counter0 < 10 %}0{% endif %}{{ forloop.counter0 }}</option>
     {% endfor %}
 </select>
 :   
 <select name="seconds">
     {% for x in range %}
-    <option value="{{ forloop.counter0 }}">{% if forloop.counter0 < 10 %}0{% endif %}{{ forloop.counter0 }}</option>
+    <option value="{{ forloop.counter0 }}" {% if seconds == forloop.counter0 %}selected{% endif %}>{% if forloop.counter0 < 10 %}0{% endif %}{{ forloop.counter0 }}</option>
     {% endfor %}
 </select>
 {% endwith %}

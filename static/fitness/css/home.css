@@ -621,3 +621,26 @@ input[type="file"] {
 
 
 
+/* テーマカラー */
+
+.theme_area{
+    text-align:right;
+}
+.theme_color_chk{
+    display:none;
+}
+.theme_color_label{
+    border:solid 0.2rem white;
+    border-radius:0.5rem;
+    cursor:pointer;
+
+    margin:0.25rem;
+    padding:1rem 2rem;
+}
+label[for="theme_color_1"]{ color:orange; }
+label[for="theme_color_2"]{ color:cyan;   }
+label[for="theme_color_3"]{ color:#0fc;   }
+
+#theme_color_1[type="radio"]:checked + label[for="theme_color_1"]{ color:black;background:orange; }
+#theme_color_2[type="radio"]:checked + label[for="theme_color_2"]{ color:black;background:cyan;   }
+#theme_color_3[type="radio"]:checked + label[for="theme_color_3"]{ color:black;background:#0fc;   }

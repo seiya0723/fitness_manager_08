@@ -35,14 +35,15 @@
 
     <link rel="stylesheet" href="{% static 'fitness/css/home.css' %}">
 
-
+    {# TODO:ここはテーマカラー指定したCookieを読み取り、if文で分岐する。#}
+    {% if request.COOKIES.theme == "2" %}
+    <link rel="stylesheet" href="{% static 'fitness/css/theme_cyan.css' %}">
+    {% elif request.COOKIES.theme == "3" %}
+    <link rel="stylesheet" href="{% static 'fitness/css/theme_terminal.css' %}">
+    {% else %}
     <link rel="stylesheet" href="{% static 'fitness/css/theme_origin.css' %}">
+    {% endif %}
 
-    {# シアン #}
-    {# <link rel="stylesheet" href="{% static 'fitness/css/theme_cyan.css' %}"> #}
-
-    {# ターミナルカラー #}
-    {# <link rel="stylesheet" href="{% static 'fitness/css/theme_terminal.css' %}"> #}
 
 
 
@@ -183,9 +184,9 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
                 <form action="{% url 'fitness:health' %}" method="POST">
                     {% csrf_token %}
                     {# step="0.1"とすることで小数第一位までの入力を許可できる #}
+                    <input class="flatpickr_date" type="text" name="date">
                     <input type="number" name="weight" value="{{ health.weight }}" placeholder="体重(kg)" step="0.1">
                     <input type="number" name="height" value="{{ health.height }}" placeholder="身長(cm)" step="0.1">
-                    <input class="flatpickr_date" type="text" name="date">
                     <input type="submit" value="送信">
                 </form>
 
@@ -228,9 +229,13 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <h3>テーマ設定</h3>
 
-                {# ここでテーマカラーを選べるようにする。 #}
+                <div class="theme_area">
+                    {# ここでテーマカラーを選べるようにする。 #}
+                    <input id="theme_color_1" class="theme_color_chk" type="radio" name="theme_color" value="1" {% if request.COOKIES.theme == "1" %}checked{% endif %}><label class="theme_color_label" for="theme_color_1">origin</label>
+                    <input id="theme_color_2" class="theme_color_chk" type="radio" name="theme_color" value="2" {% if request.COOKIES.theme == "2" %}checked{% endif %}><label class="theme_color_label" for="theme_color_2">cyan</label>
+                    <input id="theme_color_3" class="theme_color_chk" type="radio" name="theme_color" value="3" {% if request.COOKIES.theme == "3" %}checked{% endif %}><label class="theme_color_label" for="theme_color_3">terminal</label>
 
-
+                </div>
 
             </div>
             <div id="tab_area_2" class="tab_area">
@@ -538,7 +543,6 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
         </div>
     </div>
-
 
 
 {# スマホ用メニュー #}

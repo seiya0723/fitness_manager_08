@@ -17,6 +17,8 @@
             {% for detail in menu.details %}
             <input type="hidden" name="category" value="{{ detail.category.id }}">
             <input type="hidden" name="category_name" value="{{ detail.category.name }}">
+
+
             <input type="hidden" name="time" value="{{ detail.time.total_seconds }}">
             {% endfor %}
             <input class="menu_start" type="button" value="このメニューを始める">
@@ -57,8 +59,12 @@
                     </select>
 
 
+                    {# 引数を渡してselectタグを作る。 #}
+                    {% include "fitness/parts/time_form.html" with hours=detail.time_hours minutes=detail.time_minutes seconds=detail.time_seconds %}
+
+
                     {# TODO:ここをselectタグ仕様に書き換える #}
-                    <input type="text" name="time" placeholder="00:00:00" value="{{ detail.time_input_format }}">
+                    {# <input type="text" name="time" placeholder="00:00:00" value="{{ detail.time_input_format }}"> #}
 
 
                     <input type="hidden" name="id" value="{{ detail.id }}">

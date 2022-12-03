@@ -61,6 +61,9 @@ function draw_month_category_graph(){
     //並び替える
     data_label.sort( (a, b) => { return a.time - b.time; });
 
+    //大きいほうが先
+    //data_label.sort( (a, b) => { return b.time - a.time; });
+
     console.log(data_label);
 
     //分離させる
@@ -72,8 +75,8 @@ function draw_month_category_graph(){
     }
 
     /*
-    let categories  = [];
-    let times       = [];
+    let categories  = []; // A,B,C
+    let times       = []; // 10,5,9
 
 
     for (let category_elem of category_elems){

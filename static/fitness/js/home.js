@@ -21,7 +21,6 @@ window.addEventListener("load" , function (){
     //メニューの編集もチェックを消しておく。
     $(".menu_edit_chk").prop("checked",false);
 
-
     //新規作成時・編集時の並び替え
     let elem    = document.getElementById('fitness_menu_area');
     let target  = new MutationObserver(function(){ detail_sortable() });
@@ -72,7 +71,6 @@ window.addEventListener("load" , function (){
 
     $(document).on("click", "#fitness_memory_submit", function() { fitness_memory_submit(this) });
 
-
     //TODO:カレンダーの日付をクリックした時、日ごとのページへジャンプする
     $(document).on("click",".calendar_day_exist", function(){
         //日付を抜き取る
@@ -86,13 +84,11 @@ window.addEventListener("load" , function (){
         $("html,body").animate({scrollTop:$("#day_"+day).offset().top}, 100);
     });
 
-
     $(document).on("click", ".target_done", function(){ target_done(this); });
     $(document).on("click", ".target_submit", function(){ target_submit(this); });
 
     //音量の調整
     $(document).on("change",".volume_input", function(){ volume_input(this)  });
-
 
     //DjangoMessageFrameworkは5秒経ったら自動的に消える
     setTimeout(function(){
@@ -105,13 +101,21 @@ window.addEventListener("load" , function (){
         $(this).parents(".message_body").css({"display":"none"});
     });
 
-
     //TODO:inputタグでEnterキーが押されたら無効化する。
-    $("input").on("keydown", function(e) {
+    $(document).on("keydown", "input", function(e) {
         if ((e.keyCode && e.keyCode === 13)) {
             return false;
         }
     });
+
+
+    //TODO:テーマ変更時の対処。
+    $(document).on("change", "[name='theme_color']", function(){
+        console.log(this.value);
+        document.cookie = "theme=" + this.value + ";SameSite=strict";
+        window.location.replace("");
+    })
+
 
 });
 
@@ -142,6 +146,9 @@ function menu_create(elem){
     for (let time of time_list){
         data.append("time", time);
     }
+
+    //これだとエラーになってしまう
+    // data.set("time", time_list);
 
     //===========================
 
@@ -206,6 +213,30 @@ function menu_edit(elem){
     let data        = new FormData( $(form_elem).get(0) );
     let url         = $(form_elem).prop("action");
     let method      = "PUT";
+
+
+    //===========================
+
+    //複数ある hours minutes seconds を組み合わせる。
+    let hours_list      = data.getAll("hours");
+    let minutes_list    = data.getAll("minutes");
+    let seconds_list    = data.getAll("seconds");
+
+    let length          = hours_list.length;
+
+    let time_list       = [];
+    for (let i=0;i<length;i++){
+        time_list.push( Number(hours_list[i])*3600 + Number(minutes_list[i])*60 + Number(seconds_list[i]) );
+    }
+
+    //timeをリストにするには、.set()で上書きするのではなく、.appendで追加する。
+    for (let time of time_list){
+        data.append("time", time);
+    }
+
+
+
+
 
     $.ajax({
         url: url,

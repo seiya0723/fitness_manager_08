@@ -374,6 +374,8 @@ class MenuView(LoginRequiredMixin,View):
         #Menuの保存(返り値はMenuDetailのmenuフィールドで使うので取っておく)
         menu    = form.save()
 
+
+
         #MenuDetailの保存処理(同じname属性が複数ある場合、全て取得するには、.getlist()を使う。返り値はリスト)
         times       = request.POST.getlist("time")
         categories  = request.POST.getlist("category")
