@@ -626,7 +626,7 @@ input[type="file"] {
 .theme_area{
     text-align:right;
 }
-.theme_color_chk{
+.theme_color_radio{
     display:none;
 }
 .theme_color_label{

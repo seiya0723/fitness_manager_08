@@ -59,9 +59,8 @@
                     </select>
 
 
-                    {# 引数を渡してselectタグを作る。 #}
+                    {# 引数を渡してselectタグを作る。includeタグにおいて、withを使うことでテンプレート変数を引数として使うことができる  #}
                     {% include "fitness/parts/time_form.html" with hours=detail.time_hours minutes=detail.time_minutes seconds=detail.time_seconds %}
-
 
                     {# TODO:ここをselectタグ仕様に書き換える #}
                     {# <input type="text" name="time" placeholder="00:00:00" value="{{ detail.time_input_format }}"> #}

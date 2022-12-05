@@ -236,8 +236,6 @@ function menu_edit(elem){
 
 
 
-
-
     $.ajax({
         url: url,
         type: method,

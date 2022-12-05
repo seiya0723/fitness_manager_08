@@ -45,9 +45,6 @@
     {% endif %}
 
 
-
-
-
     <script src="{% static 'common/js/ajax.js' %}"></script>
     <script src="{% static 'fitness/js/home.js' %}"></script>
     <script src="{% static 'fitness/js/chart.js' %}"></script>
@@ -231,9 +228,9 @@ const ALARM = "{% static 'fitness/music/alerm.mp3' %}"
 
                 <div class="theme_area">
                     {# ここでテーマカラーを選べるようにする。 #}
-                    <input id="theme_color_1" class="theme_color_chk" type="radio" name="theme_color" value="1" {% if request.COOKIES.theme == "1" %}checked{% endif %}><label class="theme_color_label" for="theme_color_1">origin</label>
-                    <input id="theme_color_2" class="theme_color_chk" type="radio" name="theme_color" value="2" {% if request.COOKIES.theme == "2" %}checked{% endif %}><label class="theme_color_label" for="theme_color_2">cyan</label>
-                    <input id="theme_color_3" class="theme_color_chk" type="radio" name="theme_color" value="3" {% if request.COOKIES.theme == "3" %}checked{% endif %}><label class="theme_color_label" for="theme_color_3">terminal</label>
+                    <input id="theme_color_1" class="theme_color_radio" type="radio" name="theme_color" value="1" {% if request.COOKIES.theme == "1" %}checked{% endif %}><label class="theme_color_label" for="theme_color_1">origin</label>
+                    <input id="theme_color_2" class="theme_color_radio" type="radio" name="theme_color" value="2" {% if request.COOKIES.theme == "2" %}checked{% endif %}><label class="theme_color_label" for="theme_color_2">cyan</label>
+                    <input id="theme_color_3" class="theme_color_radio" type="radio" name="theme_color" value="3" {% if request.COOKIES.theme == "3" %}checked{% endif %}><label class="theme_color_label" for="theme_color_3">terminal</label>
 
                 </div>
 

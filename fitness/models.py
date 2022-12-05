@@ -127,7 +127,7 @@ class MenuDetail(models.Model):
         return duration_format( int(self.time.total_seconds()), input_format=True )
 
 
-    #MenuDetail編集時のselectタグの作成
+    #TODO:MenuDetail編集時のselectタグの作成
     def time_hours(self):
         return self.time.seconds // 3600
         
